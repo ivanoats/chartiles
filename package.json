@@ -1,0 +1,15 @@
+{
+  "name": "chartiles",
+  "version": "0.0.1",
+  "description": "A better way to serve nautical charts",
+  "license": "UNLICENSED",
+  "author": "Ivan Storck",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

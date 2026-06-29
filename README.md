@@ -1,199 +1,105 @@
-# Chartiles.com
-
-## Part 1: System Architecture
-
-The core philosophy of this architecture is **"Zero-Runtime Database overhead."** Instead of running a resource-heavy GIS stack (PostGIS + GeoServer) on a boat's navigation computer, we pre-compile the entire United States ENC dataset into static vector tile files (`.pbf`).
-
-By leveraging **Btrfs**, we can radically optimize storage via hard-linking empty-ocean tiles and deliver daily chart corrections over low-bandwidth satellite/cellular links using binary diffs.
-
-### The Data & Delivery Pipeline
-
-1. **Ingestion Engine (Cloud/Build Server):** * Downloads NOAA's bulk S-57 ENC files daily.
-* Uses `GDAL/OGR` and `tippecanoe` to translate maritime layers into Mapbox Vector Tile (MVT) specifications.
-
-
-2. **Btrfs Optimizing Packager:** * Slices tiles into a raw directory tree structure (`/tiles/{z}/{x}/{y}.pbf`).
-* Runs a deduplication script to find identical empty-water tiles and converts them into Btrfs **hard links**.
-* Packages the directory tree into a single raw Btrfs partition image (`charts.img`).
-
-
-3. **The Deployment Edge (Onboard Computer / Local Server):**
-* Loop-mounts `charts.img` read-only.
-* Uses **Nginx** to serve the static files directly. The Linux kernel automatically handles RAM caching of heavily trafficked local waters.
-* **MapLibre GL JS** frontend consumes the tiles and applies an S-52 compliant stylesheet entirely client-side.
-
-
-
----
-
-## Part 2: Implementation Plan
-
-### Phase 1: Data Pipeline Proto 
-
-* Setup a build container with `gdal-bin` and `tippecanoe`.
-* Script the automated downloading of NOAA's Coast-wide ENC suites.
-* Write an OGR2OGR extraction script to map S-57 objects (e.g., `DEPARE` for depth areas, `BOYSPP` for special purpose buoys) into simplified GeoJSON layers.
-
-### Phase 2: Btrfs Compilation Engine 
-
-* Implement `tippecanoe` arguments optimized for marine data (e.g., preventing sounding label dropping at high zoom levels using `--no-tile-stats`).
-* Build a Python/Bash deduplication script that hashes `.pbf` tiles and converts duplicates to hard links.
-* Automate the creation of a blank loopback image, formatting it to Btrfs, and copying the deduplicated tile asset tree into it.
-
-### Phase 3: Frontend & Rendering
-
-* Port open-source IHO S-52 presentation rules into a cohesive MapLibre GL JSON style sheet.
-* Develop custom MapLibre expressions to handle complex marine symbology (e.g., drawing lateral buoy shapes dynamically based on attributes, rendering dynamic safety depth contours based on user draft).
-
-### Phase 4: Delta Sync & Deployment 
-
-* Create the update mechanism using `btrfs send` and `btrfs receive` to calculate daily incremental map updates.
-* Test end-to-end orchestration via Docker Compose.
-
----
-
-## Part 3: Project Repository Blueprint (`README.md`)
-
-Save the following content directly as your project's `README.md`.
-
-```markdown
 # ChartTiles
 
-ChartTiles is an open-source, ultra-high-performance, zero-database nautical chart server designed for web apps and offline/onboard marine navigation. 
+**Open-source vector chart pipeline and viewer for NOAA Electronic Navigational Charts.**
 
-Inspired by the architecture of OpenFreeMap, it compiles raw NOAA S-57 Electronic Navigational Charts (ENCs) into standard vector tiles (`.pbf`) packed inside a deduplicated, loop-mounted **Btrfs partition image**. By using Btrfs hard links for empty ocean tiles and serving raw files via Nginx, it eliminates GIS server overhead and relies completely on the Linux kernel cache for lightning-fast tile delivery.
+> **Safety notice — not for primary navigation.** ChartTiles is reference and planning software. Mariners are responsible for maintaining redundant, type-approved navigation systems aboard their vessels. The data here is derived from NOAA ENCs and is subject to publication delays, processing errors, and the absence of any quality-management certification. Do not use as a primary nav aid.
 
-## Key Features
-* **Zero Database Runtime:** No PostGIS, MapServer, or GeoServer required. It operates purely on static files.
-* **Extreme Storage Optimization:** Millions of identical empty-ocean tiles share the exact same physical blocks on disk using Btrfs hard links.
-* **MapLibre Native:** Delivers raw vector data allowing the frontend to dynamically handle IHO S-52 styling, day/dusk/night navigation modes, and safety depth contours.
-* **Delta Updates:** Ship tiny, daily incremental updates to vessels at sea via `btrfs send/receive` streams without redownloading the entire map image.
-```
----
+## Status
 
-## Architecture Overview
+**Pre-v0.1 — planning phase.** This repository currently contains documentation and ADRs; the pipeline and viewer are not yet implemented. See [docs/implementation-plan.md](docs/implementation-plan.md) for the build schedule and [docs/roadmap.md](docs/roadmap.md) for the broader timeline.
+
+If you arrived here expecting to download charts: come back in roughly six months for the v0.1 Pacific Northwest release.
+
+## What ChartTiles is
+
+ChartTiles compiles NOAA's Electronic Navigational Charts into modern vector tiles, packaged as a single [PMTiles](https://github.com/protomaps/PMTiles) archive per region. The same archive serves:
+
+- **A browser viewer**, via MapLibre GL JS + `pmtiles.js` reading HTTP byte ranges directly from object storage. No tile server.
+- **An offline / onboard viewer**, via a small nginx serving the PMTiles file from local disk on a Raspberry Pi or mini-PC at the nav station.
+
+The whole system is static files plus a weekly cloud build. There is no GIS database at runtime.
+
+## Architecture in one diagram
 
 ```text
-  [ NOAA S-57 ENCs ] 
-          │
-          ▼  (GDAL + Tippecanoe)
-  [ Raw Vector Tiles ] 
-          │
-          ▼  (Deduplication & Hard Linking)
-  [ Btrfs Partition Image (.img) ] ──► Loop-mounted on target machine
-          │
-          ▼  (Zero-overhead Static File Serving)
-      [ Nginx ]
-          │
-          ▼  (Vector .pbf Data over HTTP)
-   [ MapLibre GL JS ] ──► Renders S-52 Stylesheet on client browser
-
+  NOAA ENC (S-57)
+        │
+        ▼   weekly build: ogr2ogr → tippecanoe → pmtiles convert
+  Single PMTiles archive (e.g. pnw.pmtiles)
+        │
+        ├──────────────► Cloudflare R2 + CDN ──► Browser (MapLibre + pmtiles.js)
+        │                          ▲
+        └──────────────────────────┴──► Onboard sync (aria2c) ──► nginx ──► Nav-station browser
 ```
 
----
+Full C4 model and sequence diagrams in [docs/architecture/](docs/architecture/).
 
-## Getting Started (Quick Start Deployment)
-
-To deploy a ready-made NOAA chart server for all US waters, you can spin up the environment using Docker Compose.
-
-### Prerequisites
-
-* A Linux host system with **Btrfs support** installed (`apt-get install btrfs-progs`).
-* Docker and Docker Compose.
-
-### 1. Clone the Repository
-
-```bash
-git clone [https://github.com/ivanoats/chartiles.git](https://github.com/ivanoats/chartiles.git)
-cd chartiles
+## Repository layout
 
 ```
-
-### 2. Download the Latest Btrfs Chart Image
-
-Download the pre-compiled NOAA Chart Image (~12GB compressed, expands to ~35GB containing hundreds of millions of hard-linked files):
-
-```bash
-wget [https://data.chartiles.com/latest/noaa_usa_waters.img.gz](https://data.chartiles.com/latest/noaa_usa_waters.img.gz)
-gunzip noaa_usa_waters.img.gz
-
+chartiles/
+├── README.md            # this file
+├── docs/                # all docs (start here)
+│   ├── README.md        # docs index
+│   ├── implementation-plan.md
+│   ├── business-plan.md
+│   ├── roadmap.md
+│   ├── glossary.md
+│   ├── risks-and-safety.md
+│   ├── architecture/    # C4 levels 1–3 + data flows
+│   └── adr/             # architecture decision records
+└── (pipeline/, web/, onboard/ to be added during Phase 1)
 ```
 
-### 3. Loop-Mount the Image
+## Documentation
 
-Mount the chart image read-only into your data directory:
+Start with [docs/README.md](docs/README.md) for the full index. Highlights:
+
+- [docs/implementation-plan.md](docs/implementation-plan.md) — phased v0 → v1 plan with deliverables and exit gates
+- [docs/business-plan.md](docs/business-plan.md) — market, customers, revenue model, KPIs
+- [docs/roadmap.md](docs/roadmap.md) — 18-month timeline with funding strategy
+- [docs/architecture/](docs/architecture/) — system context, containers, components, data flows
+- [docs/adr/](docs/adr/) — architecture decisions, including [why PMTiles instead of the Btrfs scheme this project originally proposed](docs/adr/0003-pmtiles-over-btrfs.md)
+- [docs/risks-and-safety.md](docs/risks-and-safety.md) — safety posture, technical and strategic risk registers
+- [docs/glossary.md](docs/glossary.md) — marine, GIS, and tile-format vocabulary
+
+## Scope of v0.1
+
+- **Geographic:** Pacific Northwest only — Salish Sea, Puget Sound, San Juans, Strait of Juan de Fuca, coastal Washington to the Columbia. See [ADR-0004](docs/adr/0004-pacific-northwest-scope-for-v0-1.md).
+- **Data:** NOAA ENC. No other hydrographic offices in v0.1.
+- **Deliverable:** a single `pnw.pmtiles` archive plus a working web viewer plus an onboard configuration.
+- **Not in v0.1:** routing, AIS overlay, weather, crowdsourced soundings, native mobile SDKs.
+
+## Quick start
+
+Not available yet — Phase 1 hasn't started. The intended quick start, post-v0.1:
 
 ```bash
-mkdir -p data/tiles
-sudo mount -o loop,ro,subvol=@tiles noaa_usa_waters.img data/tiles
+# Web viewer
+open https://chartiles.com
 
-```
-
-### 4. Spin up the Stack
-
-```bash
+# Onboard rig (Raspberry Pi / mini-PC)
+git clone https://github.com/ivanoats/chartiles.git
+cd chartiles/onboard
+./sync.sh        # downloads latest pnw.pmtiles
 docker compose up -d
-
+# Point any device on the boat's wifi at http://chartiles.local:8080
 ```
 
-Your vector tile server is now live at `http://localhost:8080/tiles/{z}/{x}/{y}.pbf`. Access `http://localhost:8080` in your browser to view the built-in MapLibre chart plotter interface.
+This README will be updated with real instructions when v0.1 ships.
 
----
+## Contributing
 
-## Configuration & Compose Stack
+Contribution guidelines will be added before v0.1. In the meantime:
 
-The deployment utilizes a high-performance Nginx configuration tweaked specifically for high-concurrency static file lookups.
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-
-services:
-  chart-server:
-    image: nginx:alpine
-    container_name: chartfreemap_nginx
-    ports:
-      - "8080:80"
-    volumes:
-      - ./data/tiles:/usr/share/nginx/html/tiles:ro
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./public:/usr/share/nginx/html/public:ro
-    restart: unless-stopped
-
-```
-
----
-
-## Data Compiling Pipeline (For Developers)
-
-If you want to compile your own custom charts from raw NOAA S-57 files:
-
-1. **Download NOAA ENCs:** Place raw `.000` charting files inside the `./import` directory.
-2. **Run Pipeline Parsing:** Build the tiles using Tippecanoe:
-```bash
-docker run --rm -v $(pwd):/data chartfreemap-builder /data/scripts/compile.sh
-
-```
-
-
-3. **Generate Optimized Btrfs Image:**
-```bash
-# Create a sparse loopback file
-dd if=/dev/zero of=custom_charts.img bs=1M count=0 seek=50000
-mkfs.btrfs custom_charts.img
-
-# Mount and run deduplication script
-sudo mount -o loop custom_charts.img /mnt
-python3 scripts/deduplicate_and_copy.py --src ./tiles --dest /mnt
-sudo umount /mnt
-
-```
-
-
-
----
+- Read the [ADRs](docs/adr/) before proposing architectural changes.
+- File issues for missing edge cases in the docs, unclear safety language, or factual errors about the maritime / GIS domain.
+- PRs against `docs/` are welcome now.
 
 ## License
 
-This project is licensed under the MIT License. Mapping data is sourced from NOAA (National Oceanic and Atmospheric Administration) and is in the public domain.
+MIT — see [LICENSE](LICENSE) (to be added).
 
+NOAA chart data is in the public domain. We attribute NOAA in the viewer chrome and in PMTiles metadata as a matter of credit and provenance even though no attribution is legally required.
+
+The license rationale, including why MIT over Apache 2.0 and the relationship to the safety disclaimer, is in [ADR-0008](docs/adr/0008-mit-license-with-not-for-navigation-disclaimer.md).
