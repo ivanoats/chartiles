@@ -6,9 +6,11 @@
 
 ## Status
 
-**Pre-v0.1 — planning phase.** This repository currently contains documentation and ADRs; the pipeline and viewer are not yet implemented. See [docs/implementation-plan.md](docs/implementation-plan.md) for the build schedule and [docs/roadmap.md](docs/roadmap.md) for the broader timeline.
+**Pre-v0.1 — Shilshole inspection prototype implemented.** A local pipeline downloads selected NOAA ENC cells, clips a small Shilshole Bay area, builds PMTiles, and checks feature retention at maximum zoom. A browser viewer supports local use and attribute inspection. Ivan completed the manual NOAA source checks and reported no discrepancies on September 26, 2026. Next: [Puget Sound expansion](docs/puget-sound-expansion.md).
 
-If you arrived here expecting to download charts: come back in roughly six months for the v0.1 Pacific Northwest release.
+For the larger regional benchmark, run `npm run charts:puget` followed by `npm run build`. See [Puget Sound scope and measurements](docs/puget-sound-benchmark.md).
+
+See [the prototype guide](docs/shilshole-prototype.md) for scope, validation and limitations. The broader planning documents describe future work, not completed capabilities.
 
 ## What ChartTiles is
 
@@ -48,7 +50,9 @@ chartiles/
 │   ├── risks-and-safety.md
 │   ├── architecture/    # C4 levels 1–3 + data flows
 │   └── adr/             # architecture decision records
-└── (pipeline/, web/, onboard/ to be added during Phase 1)
+├── pipeline/            # NOAA acquisition, extraction, packaging and validation
+├── web/                 # local MapLibre inspection viewer
+└── tests/               # pipeline safeguards and browser integration
 ```
 
 ## Documentation
@@ -72,21 +76,19 @@ Start with [docs/README.md](docs/README.md) for the full index. Highlights:
 
 ## Quick start
 
-Not available yet — Phase 1 hasn't started. The intended quick start, post-v0.1:
+Requires Node.js 22.12+, Python 3.10+, GDAL and tippecanoe. On macOS:
 
 ```bash
-# Web viewer
-open https://chartiles.com
-
-# Onboard rig (Raspberry Pi / mini-PC)
-git clone https://github.com/ivanoats/chartiles.git
-cd chartiles/onboard
-./sync.sh        # downloads latest pnw.pmtiles
-docker compose up -d
-# Point any device on the boat's wifi at http://chartiles.local:8080
+brew install gdal tippecanoe
+npm ci
+npm run charts
+npm run build
+npm run preview
 ```
 
-This README will be updated with real instructions when v0.1 ships.
+Open the local URL printed by Vite. The built viewer works with internet disconnected while the local server stays running. Click features to inspect their attributes. This is a basic inspection style, not a navigational portrayal.
+
+See [docs/shilshole-prototype.md](docs/shilshole-prototype.md) for tests and data provenance.
 
 ## Contributing
 

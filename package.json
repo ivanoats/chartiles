@@ -10,6 +10,21 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "charts": "python3 pipeline/build.py",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "python3 -m unittest discover -s tests",
+    "test:browser": "playwright test",
+    "charts:puget": "python3 pipeline/build.py --config pipeline/puget-sound.json",
+    "benchmark": "node pipeline/benchmark.cjs"
+  },
+  "dependencies": {
+    "maplibre-gl": "^6.11.2",
+    "pmtiles": "^4.5.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "vite": "^8.3.1"
   }
 }

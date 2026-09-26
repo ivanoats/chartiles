@@ -7,7 +7,7 @@ Sequence diagrams for the three flows that matter end to end: the weekly build, 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Cron as GitHub Actions (cron)
+    participant Cron as GH Actions cron
     participant Pipeline as Build Pipeline
     participant NOAA
     participant R2 as Cloudflare R2
@@ -15,23 +15,24 @@ sequenceDiagram
 
     Cron->>Pipeline: Trigger weekly build
     Pipeline->>NOAA: GET cell list for PNW bounding box
-    NOAA-->>Pipeline: List of .000 cells
+    NOAA-->>Pipeline: List of S-57 cells
     loop For each cell
-        Pipeline->>NOAA: GET cell.000 (with MD5 check)
-        NOAA-->>Pipeline: cell.000 bytes
+        Pipeline->>NOAA: GET cell with MD5 check
+        NOAA-->>Pipeline: cell bytes
     end
-    Pipeline->>Pipeline: ogr2ogr extract layers → GeoJSON
+    Pipeline->>Pipeline: ogr2ogr extract layers to GeoJSON
     Pipeline->>Pipeline: Normalize attributes, filter features
-    Pipeline->>Pipeline: tippecanoe build MVT → MBTiles
-    Pipeline->>Pipeline: pmtiles convert → pnw-YYYY-MM-DD.pmtiles
-    Pipeline->>Pipeline: Compute SHA-256, write manifest.json
-    Pipeline->>R2: PUT pnw-YYYY-MM-DD.pmtiles
+    Pipeline->>Pipeline: tippecanoe build MVT to MBTiles
+    Pipeline->>Pipeline: pmtiles convert to versioned PMTiles
+    Pipeline->>Pipeline: Compute SHA-256, write manifest
+    Pipeline->>R2: PUT versioned PMTiles
     Pipeline->>R2: PUT manifest.json
-    Pipeline->>R2: Update latest pointer (pnw.pmtiles → versioned object)
-    Pipeline->>CDN: Purge manifest.json cache
-    Note over CDN: Versioned PMTiles cached indefinitely; only manifest needs purge
-    Pipeline->>Cron: Report success (or fail loudly)
+    Pipeline->>R2: Update latest pointer
+    Pipeline->>CDN: Purge manifest cache
+    Pipeline->>Cron: Report success or fail loudly
 ```
+
+**Cache behavior:** Versioned PMTiles are cached at the edge indefinitely because their URLs include the version. Only `manifest.json` needs an explicit purge after each build.
 
 **Cadence:** Weekly, aligned with NOAA Notice to Mariners. Configurable to daily later if NOAA's update rate justifies it.
 
@@ -50,34 +51,34 @@ sequenceDiagram
     participant R2 as Cloudflare R2
 
     Sailor->>Browser: Open chartiles.com
-    Browser->>CDN: GET /index.html
-    CDN-->>Browser: HTML + JS bundle
-    Browser->>CDN: GET /style.json
+    Browser->>CDN: GET index.html
+    CDN-->>Browser: HTML and JS bundle
+    Browser->>CDN: GET style.json
     CDN-->>Browser: MapLibre style JSON
-    Browser->>CDN: GET /manifest.json
-    CDN-->>Browser: { version, last_updated, pmtiles_url, sha256 }
-    Browser->>Browser: Display "Charts last updated YYYY-MM-DD"
-    Browser->>CDN: GET /pnw.pmtiles Range: bytes=0-16383 (PMTiles header)
+    Browser->>CDN: GET manifest.json
+    CDN-->>Browser: manifest with version, sha256, pmtiles_url
+    Browser->>Browser: Display charts last-updated date
+    Browser->>CDN: GET PMTiles header (range 0 to 16383)
     CDN-->>Browser: First 16 KB of PMTiles
     Browser->>Browser: Parse PMTiles directory
     loop For each visible tile
-        Browser->>CDN: GET /pnw.pmtiles Range: bytes=N-M
+        Browser->>CDN: GET PMTiles range N to M
         alt Tile cached at edge
-            CDN-->>Browser: Tile bytes (cache HIT)
+            CDN-->>Browser: Tile bytes - cache HIT
         else Tile not cached
-            CDN->>R2: GET pnw.pmtiles Range: bytes=N-M
+            CDN->>R2: GET PMTiles range N to M
             R2-->>CDN: Tile bytes
-            CDN-->>Browser: Tile bytes (cache MISS, now cached)
+            CDN-->>Browser: Tile bytes - cache MISS, now cached
         end
         Browser->>Browser: MapLibre paints tile per style
     end
-    Sailor->>Browser: Pan / zoom / change palette
+    Sailor->>Browser: Pan, zoom, change palette
     Browser->>Browser: Re-style without re-fetching (paint only)
 ```
 
 **Latency profile:** First viewport: ~3–5 round trips for HTML + JS + style + manifest + PMTiles header, then parallel tile fetches. After cache warm-up, panning is bandwidth-bound by tile size (~10–50 KB per tile).
 
-**Why no tile server:** All decoding happens in the browser. The CDN sees only HTTP `Range` requests, which it caches by `(URL, byte range)`. No server-side decoding, no per-user state.
+**Why no tile server:** All decoding happens in the browser. The CDN sees only HTTP `Range` requests, which it caches by URL and byte range. No server-side decoding, no per-user state.
 
 ## Onboard sync path
 
@@ -93,31 +94,31 @@ sequenceDiagram
     Note over Cron,Browser: Every 6 hours, or on user request
 
     Cron->>Sync: Trigger sync check
-    Sync->>CDN: GET /manifest.json
-    CDN-->>Sync: { version: "2026-07-22", sha256: "..." }
+    Sync->>CDN: GET manifest.json
+    CDN-->>Sync: manifest with version and sha256
     Sync->>Sync: Compare with local manifest
 
     alt No update
         Sync->>Cron: Exit 0, no work
     else Update available
-        Sync->>CDN: HEAD /pnw-2026-07-22.pmtiles
-        CDN-->>Sync: Content-Length, ETag
+        Sync->>CDN: HEAD versioned PMTiles
+        CDN-->>Sync: Content-Length and ETag
         Sync->>Sync: Check available disk space
-        Sync->>CDN: GET /pnw-2026-07-22.pmtiles (aria2c, resumable, bandwidth-capped)
-        CDN-->>Sync: PMTiles bytes (may span multiple resumed sessions)
+        Sync->>CDN: GET versioned PMTiles via aria2c, resumable, bandwidth-capped
+        CDN-->>Sync: PMTiles bytes - may span multiple resumed sessions
         Sync->>Sync: Verify SHA-256 against manifest
         alt SHA mismatch
             Sync->>Sync: Discard, log failure, alert local UI
         else SHA matches
-            Sync->>Sync: Atomic rename: pnw.pmtiles.new → pnw.pmtiles
-            Sync->>Nginx: Reload (SIGHUP) to drop old file handles
+            Sync->>Sync: Atomic rename of new file over old
+            Sync->>Nginx: Reload via SIGHUP to drop old file handles
         end
     end
 
     Note over Browser,Nginx: Independent of sync; runs whenever sailor opens viewer
 
-    Browser->>Nginx: GET /pnw.pmtiles Range: bytes=N-M
-    Nginx-->>Browser: Tile bytes (from local filesystem)
+    Browser->>Nginx: GET PMTiles range N to M
+    Nginx-->>Browser: Tile bytes from local filesystem
 ```
 
 **Bandwidth model:** A weekly full download of `pnw.pmtiles` is on the order of hundreds of MB. Over LTE at marina rates that's ~5–15 minutes; over Starlink, ~1–2 minutes; over marina wifi, variable. The bandwidth cap defaults to 1 Mbit/s so the sync doesn't starve other boat-network traffic.

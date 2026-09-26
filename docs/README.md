@@ -27,3 +27,11 @@ These docs assume the reader is comfortable with:
 - Web infrastructure (HTTP, CDN, object storage).
 - Basic GIS terminology (tiles, projections, vector vs. raster). [glossary.md](glossary.md) covers the rest.
 - The S-57 / S-52 / ENC vocabulary used by maritime hydrographic offices — also in [glossary.md](glossary.md).
+
+## Working prototype
+
+[Shilshole prototype](shilshole-prototype.md) — run instructions, measured results, validation boundaries and next gate.
+
+[Puget Sound expansion](puget-sound-expansion.md) — next implementation steps, coverage decisions and measurement gates.
+
+[Puget Sound benchmark](puget-sound-benchmark.md) — regional selection, measurements and review status.

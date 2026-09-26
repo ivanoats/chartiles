@@ -1,0 +1,9 @@
+{
+  "name": "shilshole",
+  "bounds": [-122.43, 47.66, -122.38, 47.70],
+  "cells": ["US5SEAGK", "US5SEAGL", "US5SEAHK", "US5SEAHL"],
+  "scale": 12000,
+  "minzoom": 12,
+  "maxzoom": 16,
+  "layers": ["M_COVR", "LNDARE", "COALNE", "DEPARE", "DEPCNT", "SOUNDG", "BOYLAT", "BOYSAW", "BOYSPP", "BCNLAT", "LIGHTS", "WRECKS", "UWTROC", "OBSTRN"]
+}
