@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import zipfile
-from pipeline.chart_manifest import archive_file, digest, validate_version
+from pipeline.chart_manifest import archive_file, digest, raster_header, validate_version
 from pipeline.publish_charts import validated_files, main
 from pipeline import package_offline
 
@@ -20,7 +20,7 @@ def make_bundle(root):
     manifest = {'sha256': sha, 'bytes': 14, 'pmtiles_url': f'./charts/{sha}.pmtiles', 'region': 'test'}
     header = bytearray(127)
     header[:8] = b'PMTiles\x03'
-    header[99:102] = bytes([2, 8, 16])
+    header[99:102] = bytes([2, 0, 16])
     struct.pack_into('<4i', header, 102, -1240000000, 470000000, -1220000000, 490000000)
     raster = charts/'raster'
     raster.write_bytes(header)
@@ -28,12 +28,20 @@ def make_bundle(root):
     raster.rename(charts/f'{rsha}.pmtiles')
     manifest.update(schema_version=2, raster={'sha256': rsha, 'bytes':127,
         'pmtiles_url': f'./charts/{rsha}.pmtiles', 'tile_type':'png', 'tile_size':256,
-        'bounds':[-124,47,-122,49], 'minzoom':8, 'maxzoom':16, 'attribution':'NOAA'})
+        'bounds':[-124,47,-122,49], 'minzoom':0, 'maxzoom':16, 'attribution':'NOAA'})
     (charts/'manifest.json').write_text(json.dumps(manifest))
     return charts, manifest
 
 
 class RasterTests(unittest.TestCase):
+    def test_real_converter_header_with_zero_minzoom(self):
+        # Captured bytes from a CLI-converted NOAA archive, not a synthetic layout.
+        header = Path(__file__).parent/'fixtures/noaa-raster-v3-header.bin'
+        self.assertEqual(raster_header(header), {
+            'tile_type': 'png', 'minzoom': 0, 'maxzoom': 16,
+            'bounds': [-129.917222, 47.008889, -116.333333, 60.333333],
+        })
+
     def test_rejects_unsafe_url_and_mismatched_header(self):
         with tempfile.TemporaryDirectory() as folder:
             charts, manifest = make_bundle(Path(folder))

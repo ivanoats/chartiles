@@ -19,6 +19,8 @@ def raster_header(path):
         header = source.read(127)
     if len(header) != 127 or header[:8] != b'PMTiles\x03':
         raise ValueError('Expected a PMTiles v3 archive')
+    # PMTiles v3 section 3.1: byte 98 is tile compression, 99 is tile type.
+    # https://github.com/protomaps/PMTiles/blob/main/spec/v3/spec.md#31-overview
     if header[99] not in (2, 3, 4):
         raise ValueError('Expected PNG, JPEG or WebP raster tiles')
     return {'tile_type': {2: 'png', 3: 'jpg', 4: 'webp'}[header[99]],
