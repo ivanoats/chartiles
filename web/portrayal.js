@@ -17,7 +17,11 @@ export function installImages(map) {
     ctx.font = font; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.lineWidth = 5; ctx.strokeStyle = '#ffffff';
     ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
-    ctx.fillStyle = depth ? '#183f50' : id === 'aid:LIGHTS' ? '#865298' : ['aid:WRECKS', 'aid:UWTROC', 'aid:OBSTRN'].includes(id) ? '#8e2345' : '#364b44';
+    let color = '#364b44';
+    if (depth) color = '#183f50';
+    else if (id === 'aid:LIGHTS') color = '#865298';
+    else if (['aid:WRECKS', 'aid:UWTROC', 'aid:OBSTRN'].includes(id)) color = '#8e2345';
+    ctx.fillStyle = color;
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
     map.addImage(id, ctx.getImageData(0, 0, canvas.width, canvas.height), {pixelRatio: 2});
   });

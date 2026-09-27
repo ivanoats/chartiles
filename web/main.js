@@ -35,8 +35,8 @@ async function start() {
       filter: ['==', ['geometry-type'], 'Point'],
       layout: {'icon-image': id === 'SOUNDG'
         ? ['concat', 'depth:', ['to-string', ['get', 'depth_m']]] : `aid:${id}`,
-        'icon-allow-overlap': false, 'icon-padding': id === 'SOUNDG' ? 3 : 2}});
-    layers.push({id: `${id}-extent`, type: 'line', minzoom: detailZoom[id], source: 'enc', 'source-layer': id,
+        'icon-allow-overlap': false, 'icon-padding': id === 'SOUNDG' ? 3 : 2}},
+      {id: `${id}-extent`, type: 'line', minzoom: detailZoom[id], source: 'enc', 'source-layer': id,
       filter: ['!=', ['geometry-type'], 'Point'], paint: {'line-color': color, 'line-width': 2}});
   }
   const bounds = [[manifest.bounds[0], manifest.bounds[1]], [manifest.bounds[2], manifest.bounds[3]]];

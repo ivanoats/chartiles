@@ -7,4 +7,6 @@
 .map-tools button:hover {background:#edf5fc}
 .map-tools button:focus-visible {outline:3px solid #176fc1;outline-offset:2px}
 
-.coverage-control button {width:auto;padding:0 12px;font:600 12px system-ui}.coverage-control button[aria-pressed="true"] {background:#dbeeff;color:#176fc1}
+.coverage-control button {width:auto;padding:0 12px;font:600 12px system-ui}.coverage-control button[aria-pressed="true"] {background:#dbeeff;color:#12558f}
+
+output {display:block;margin:1em 0}aside output {font-size:13px}
