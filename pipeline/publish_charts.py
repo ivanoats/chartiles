@@ -23,6 +23,13 @@ def main():
     parser.add_argument('--upload', action='store_true', help='Write to remote R2')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
+    files = validated_files(root)
+    for path, content_type in files:
+        publish_file(root, args.bucket, path, content_type, args.upload)
+    print('Upload complete.' if args.upload else 'Validated dry run. Use --upload to publish.')
+
+
+def validated_files(root):
     charts = root / 'web/public/charts'
     manifest_path = charts / 'manifest.json'
     manifest = json.loads(manifest_path.read_text())
@@ -50,16 +57,27 @@ def main():
             files.append((path, 'application/geo+json' if path.suffix == '.geojson' else 'application/json'))
     # Publish the pointer only after all of its data has uploaded successfully.
     files.append((manifest_path, 'application/json'))
-    for path, content_type in files:
-        cache = 'no-cache' if path == manifest_path else 'public, max-age=31536000, immutable'
-        command = ['npx', '--yes', 'wrangler@4.142.0', 'r2', 'object', 'put',
-                   f'{args.bucket}/charts/{path.name}', '--remote',
-                   '--file', str(path.relative_to(root)), '--content-type', content_type,
-                   '--cache-control', cache]
-        print(shlex.join(command), flush=True)
-        if args.upload:
-            subprocess.run(command, cwd=root, check=True)
-    print('Upload complete.' if args.upload else 'Validated dry run. Use --upload to publish.')
+    return files
+
+
+def publish_file(root, bucket, path, content_type, upload):
+    target = f'{bucket}/charts/{path.name}'
+    local_file = path.relative_to(root).as_posix()
+    filename = r'(?:manifest\.json|[a-f0-9]{64}(?:\.pmtiles|-coverage\.(?:json|geojson)))'
+    # Validate the complete arguments here, immediately before the CLI boundary.
+    if not re.fullmatch(r'[a-z0-9][a-z0-9-]{1,61}[a-z0-9]/charts/' + filename, target):
+        raise ValueError('Invalid upload target')
+    if not re.fullmatch(r'web/public/charts/' + filename, local_file):
+        raise ValueError('Invalid upload file')
+    if content_type not in ('application/json', 'application/geo+json', 'application/octet-stream'):
+        raise ValueError('Invalid content type')
+    cache = 'no-cache' if path.name == 'manifest.json' else 'public, max-age=31536000, immutable'
+    command = ['npx', '--yes', 'wrangler@4.142.0', 'r2', 'object', 'put',
+               target, '--remote', '--file', local_file, '--content-type', content_type,
+               '--cache-control', cache]
+    print(shlex.join(command), flush=True)
+    if upload:
+        subprocess.run(command, cwd=root, check=True)
 
 
 if __name__ == '__main__':

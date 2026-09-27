@@ -1,3 +1,23 @@
+function parseByteRange(value, size) {
+  const match = /^bytes=(\d*)-(\d*)$/.exec(value);
+  // Ignore unsupported syntax, including multiple ranges.
+  if (!match || !(match[1] || match[2])) return undefined;
+  const start = match[1] ? Number(match[1]) : Math.max(0, size - Number(match[2]));
+  const end = match[1] && match[2] ? Math.min(Number(match[2]), size - 1) : size - 1;
+  if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start > end || start >= size) {
+    return {invalid: true};
+  }
+  return {offset: start, length: end - start + 1};
+}
+
+function requestRange(request, metadata) {
+  const value = request.headers.get('Range');
+  const ifRange = request.headers.get('If-Range');
+  if (request.method !== 'GET' || !value) return undefined;
+  if (ifRange && ifRange !== metadata.httpEtag) return undefined;
+  return parseByteRange(value, metadata.size);
+}
+
 // Public, read-only chart delivery. Bucket writes remain authenticated.
 export default {
   async fetch(request, env) {
@@ -31,27 +51,16 @@ export default {
     });
     if (request.headers.has('If-Match') && !matches(request.headers.get('If-Match'))) return reply(412);
     if (matches(request.headers.get('If-None-Match'), true)) return reply(304);
-    let range;
-    const value = request.headers.get('Range');
-    const ifRange = request.headers.get('If-Range');
-    if (request.method === 'GET' && value && (!ifRange || ifRange === metadata.httpEtag)) {
-      const match = /^bytes=(\d*)-(\d*)$/.exec(value);
-      // Ignore unsupported or malformed range syntax, including multiple ranges.
-      if (match && (match[1] || match[2])) {
-        const start = match[1] ? Number(match[1]) : Math.max(0, metadata.size - Number(match[2]));
-        const end = match[1] && match[2] ? Math.min(Number(match[2]), metadata.size - 1) : metadata.size - 1;
-        if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start > end || start >= metadata.size) {
-          headers.set('Content-Range', `bytes */${metadata.size}`);
-          headers.set('Cache-Control', 'no-store');
-          return reply(416);
-        }
-        range = {offset: start, length: end - start + 1};
-      }
+    const range = requestRange(request, metadata);
+    if (range?.invalid) {
+      headers.set('Content-Range', `bytes */${metadata.size}`);
+      headers.set('Cache-Control', 'no-store');
+      return reply(416);
     }
     headers.set('Content-Length', String(range?.length ?? metadata.size));
     if (request.method === 'HEAD') return reply(200);
     const object = await env.CHARTS.get(key, {range, onlyIf: {etagMatches: metadata.etag}});
-    if (!object || !object.body) {
+    if (!object?.body) {
       headers.delete('Content-Length');
       headers.set('Cache-Control', 'no-store');
       return reply(503);

@@ -9,19 +9,21 @@ import re
 
 class Handler(SimpleHTTPRequestHandler):
     def send_head(self):
+        self.remaining = None
         path = Path(self.translate_path(self.path))
-        if path.is_dir() or not path.is_file() or not self.headers.get('Range'):
+        if self.command != 'GET' or self.headers.get('If-Range') or path.is_dir() or not path.is_file() or not self.headers.get('Range'):
             return super().send_head()
         size = path.stat().st_size
         match = re.fullmatch(r'bytes=(\d*)-(\d*)', self.headers['Range'])
         if not match or not any(match.groups()):
-            self.send_error(416); return None
+            return super().send_head()
         first, last = match.groups()
         start = int(first) if first else max(0, size - int(last))
         end = min(int(last), size-1) if first and last else size-1
         if start > end or start >= size:
             self.send_response(416)
             self.send_header('Content-Range', f'bytes */{size}')
+            self.send_header('Content-Length', '0')
             self.end_headers(); return None
         stream = path.open('rb'); stream.seek(start)
         self.send_response(206)

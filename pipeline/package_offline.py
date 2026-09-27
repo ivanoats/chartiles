@@ -7,6 +7,18 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def coverage_files(charts, sha):
+    pair = [charts/f'{sha}-coverage{suffix}' for suffix in ('.json', '.geojson')]
+    if not any(p.exists() for p in pair):
+        return []
+    if not all(p.is_file() for p in pair):
+        raise ValueError('Coverage audit requires both JSON and GeoJSON files')
+    report, geometry = [json.loads(p.read_text()) for p in pair]
+    if report.get('archive_sha256') != sha or geometry.get('type') != 'FeatureCollection':
+        raise ValueError('Coverage audit does not match the archive or expected format')
+    return pair
+
+
 def package():
     site = ROOT/'dist'
     manifest = json.loads((site/'charts/manifest.json').read_text())
@@ -16,7 +28,7 @@ def package():
         raise ValueError('Chart hash mismatch; refusing to package')
     files = [p for p in site.rglob('*') if p.is_file() and 'charts' not in p.relative_to(site).parts]
     files += [site/'charts/manifest.json', archive]
-    files += [p for p in (site/'charts').glob(f'{sha}-coverage.*') if p.is_file()]
+    files += coverage_files(site/'charts', sha)
     hashes = {f'site/{p.relative_to(site).as_posix()}': hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     server = ROOT/'onboard/serve.py'
     hashes['serve.py'] = hashlib.sha256(server.read_bytes()).hexdigest()

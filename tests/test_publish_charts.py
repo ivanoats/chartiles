@@ -24,3 +24,13 @@ class PublishingArgumentsTests(unittest.TestCase):
             main()
         self.assertEqual(failure.exception.code, 2)
         run.assert_not_called()
+
+    def test_direct_publish_rejects_unsafe_arguments(self):
+        from pathlib import Path
+        from pipeline.publish_charts import publish_file
+        root = Path('/workspace')
+        with patch('pipeline.publish_charts.subprocess.run') as run:
+            for bucket, filename in [('--help', 'manifest.json'), ('valid-bucket', '--config'), ('valid-bucket', '../secret')]:
+                with self.subTest(bucket=bucket, filename=filename), self.assertRaises(ValueError):
+                    publish_file(root, bucket, root/'web/public/charts'/filename, 'application/json', True)
+            run.assert_not_called()
