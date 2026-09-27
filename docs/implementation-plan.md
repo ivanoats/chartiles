@@ -1,5 +1,14 @@
 # Implementation Plan
 
+## Current sequencing update — 2026-09-27
+
+The next milestone is the [raster chart view plan](raster-chart-plan.md), as
+recorded in [ADR 0009](adr/0009-raster-chart-view-with-vector-inspection.md).
+It precedes further S-52-inspired styling in Phase 2 below. The original phase
+estimates and navigation-oriented success metric are historical planning targets;
+the new milestone uses explicit inspection and display acceptance checks.
+
+
 A phased plan from empty repo to v1.0. Each phase has a scope, deliverables, success metric, and an exit gate. Dates are indicative; gates are not.
 
 ## Operating principles

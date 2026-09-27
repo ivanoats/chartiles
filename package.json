@@ -18,7 +18,9 @@
     "test:browser": "playwright test",
     "charts:puget": "python3 pipeline/build.py --config pipeline/puget-sound.json",
     "benchmark": "node pipeline/benchmark.cjs",
-    "package:offline": "npm run build && python3 pipeline/package_offline.py"
+    "package:offline": "npm run build && python3 pipeline/package_offline.py",
+    "charts:raster": "python3 pipeline/import_raster.py",
+    "package:offline:raster": "npm run build && python3 pipeline/package_offline.py --include-raster"
   },
   "dependencies": {
     "maplibre-gl": "^6.11.2",

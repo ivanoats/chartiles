@@ -14,7 +14,7 @@ Build and validate the region locally first. Preview the upload commands:
 python3 pipeline/publish_charts.py
 ```
 
-Upload the current archive and optional coverage audit, then update the manifest:
+Upload the current vector archive, optional raster archive and coverage audit, then update the manifest:
 
 ```sh
 python3 pipeline/publish_charts.py --upload

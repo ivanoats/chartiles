@@ -150,6 +150,12 @@ def run(config_path, snapshot=None):
                         'Coverage and feature fidelity require manual review; zero counts do not establish absence of hazards']}
     target = ROOT / 'web/public/charts'
     target.mkdir(parents=True, exist_ok=True)
+    # Raster and ENC releases are independent. Keep the attachment for this region.
+    current = target / 'manifest.json'
+    if current.exists():
+        previous = json.loads(current.read_text())
+        if previous.get('region') == manifest['region'] and previous.get('raster'):
+            manifest.update(schema_version=2, raster=previous['raster'])
     shutil.copyfile(archive, target / f'{sha}.pmtiles')
     (stage / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     shutil.copyfile(stage / 'manifest.json', target / 'manifest.tmp')

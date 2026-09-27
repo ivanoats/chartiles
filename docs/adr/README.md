@@ -20,6 +20,7 @@ ADRs capture significant, contested, or non-obvious choices made about ChartTile
 | [0006](0006-tippecanoe-for-vector-tile-generation.md) | Use tippecanoe for vector tile generation | Accepted | 2026-06-29 |
 | [0007](0007-maplibre-gl-js-for-client-rendering.md) | Use MapLibre GL JS for client rendering | Accepted | 2026-06-29 |
 | [0008](0008-mit-license-with-not-for-navigation-disclaimer.md) | MIT-license the project with a prominent "not for navigation" disclaimer | Accepted | 2026-06-29 |
+| [0009](0009-raster-chart-view-with-vector-inspection.md) | Add raster chart viewing alongside vector inspection | Accepted | 2026-09-27 |
 
 ## Authoring conventions
 

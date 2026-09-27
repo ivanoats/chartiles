@@ -1,6 +1,7 @@
 import * as maplibregl from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import {Protocol} from 'pmtiles';
+import {rasterDescriptor, installChartModes} from './chart-modes.js';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import {installCoverage} from './coverage.js';
@@ -15,6 +16,9 @@ async function start() {
   const response = await fetch('./charts/manifest.json');
   if (!response.ok) throw new Error('No chart bundle. Run npm run charts, then npm run build.');
   const manifest = await response.json();
+  let raster = null;
+  try { raster = rasterDescriptor(manifest); }
+  catch (error) { document.querySelector('#raster-warning').textContent = `${error.message}. Vector inspection remains available.`; }
   document.querySelector('h1 small').textContent = manifest.label || manifest.region;
   document.title = `ChartTiles · ${manifest.label || manifest.region} inspection`;
   const url = new URL(manifest.pmtiles_url, location.href).href;
@@ -39,16 +43,33 @@ async function start() {
       {id: `${id}-extent`, type: 'line', minzoom: detailZoom[id], source: 'enc', 'source-layer': id,
       filter: ['!=', ['geometry-type'], 'Point'], paint: {'line-color': color, 'line-width': 2}});
   }
+  const sources = {enc: {type: 'vector', url: `pmtiles://${url}`, attribution: 'NOAA ENC · experimental conversion'}};
+  if (raster) {
+    sources['raster-chart'] = {type: 'raster', tiles: [`pmtiles://${new URL(raster.pmtiles_url, location.href).href}/{z}/{x}/{y}.png`], tileSize: raster.tile_size, bounds: raster.bounds, minzoom: raster.minzoom, maxzoom: raster.maxzoom, attribution: raster.attribution};
+    layers.push({id: 'raster-chart', type: 'raster', source: 'raster-chart', minzoom: raster.minzoom, paint: {'raster-fade-duration': 0}});
+    for (const layer of layers) if (layer.source === 'enc') layer.layout = {...layer.layout, visibility: 'none'};
+  }
   const bounds = [[manifest.bounds[0], manifest.bounds[1]], [manifest.bounds[2], manifest.bounds[3]]];
+  const rasterState = {error: ''};
   const map = new maplibregl.Map({container: 'map', bounds, fitBoundsOptions: {padding: 25},
     minZoom: manifest.minzoom, maxZoom: 19, hash: true,
-    style: {version: 8, sources: {enc: {type: 'vector', url: `pmtiles://${url}`, attribution: 'NOAA ENC · experimental conversion'}}, layers}});
+    style: {version: 8, sources, layers}});
   installImages(map);
-  map.on('load', () => installCoverage(map, manifest));
+  map.once('style.load', () => {
+    installCoverage(map, manifest);
+    installChartModes(map, manifest, raster, rasterState, setMode, () => {
+      selection?.remove();
+      document.querySelector('#details').textContent = 'Select a feature.';
+      document.querySelector('#selection-status').textContent = 'No feature selected.';
+    });
+  });
   map.once('idle', () => performance.mark('chartiles-first-idle'));
   map.addControl(new maplibregl.NavigationControl());
   map.addControl(new maplibregl.ScaleControl({unit: 'metric'}));
-  map.on('error', event => { status.textContent = `Map error: ${event.error.message}`; });
+  map.on('error', event => {
+    if (event.sourceId === 'raster-chart') rasterState.error = event.error.message;
+    else status.textContent = `Map error: ${event.error.message}`;
+  });
   const toolbar = document.createElement('div');
   toolbar.className = 'maplibregl-ctrl maplibregl-ctrl-group map-tools';
   toolbar.setAttribute('role', 'group');
@@ -67,6 +88,7 @@ async function start() {
   let mode = 'inspect';
   let selection;
   const setMode = next => {
+    if (next === 'inspect' && document.querySelector('#inspect-mode').disabled) return;
     mode = next;
     document.querySelector('#inspect-mode').setAttribute('aria-pressed', String(mode === 'inspect'));
     document.querySelector('#pan-mode').setAttribute('aria-pressed', String(mode === 'pan'));
@@ -107,7 +129,7 @@ async function start() {
   });
   for (const [name, count] of Object.entries(manifest.counts)) {
     const label = document.createElement('label');
-    const input = document.createElement('input'); input.type = 'checkbox'; input.checked = count > 0; input.disabled = count === 0;
+    const input = document.createElement('input'); input.type = 'checkbox'; input.dataset.layer = name; input.checked = count > 0; input.disabled = count === 0;
     input.addEventListener('change', () => {
       for (const id of [name, `${name}-extent`]) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', input.checked ? 'visible' : 'none');
     });
