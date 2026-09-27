@@ -39,3 +39,9 @@ These docs assume the reader is comfortable with:
 [Update benchmark](update-benchmark.md) — source revision checks and measured full-replacement size.
 
 [Offline bundle](offline-bundle.md) — package, extract and serve without npm or internet.
+
+## Next milestone
+
+[Raster chart view plan](raster-chart-plan.md) — add pre-rendered chart imagery alongside vector inspection, with source qualification, offline packaging and pilot acceptance checks.
+
+[Raster chart view](raster-chart-view.md) — implemented modes, source measurements, import and release instructions.

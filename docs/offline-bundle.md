@@ -7,3 +7,9 @@ Extract the ZIP, then run `python3 serve.py` from its directory. Open http://127
 The included server supports HTTP byte ranges required by PMTiles. The viewer cannot be opened directly via file://. SHA256SUMS lists individual artifact hashes; these are integrity checks, not signatures. The bundle README contains these instructions and the inspection-only limitation. This remains a development bundle without an installer or automated update mechanism.
 
 Validation: extracted ZIP checksums and single-archive selection; local browser rendering with external requests blocked; explicit prefix, suffix and unsatisfiable HTTP range checks; existing browser integration suite. The first bundle was 57,019,267 bytes. The generated ZIP is deliberately excluded from Git; it has not been published as a release asset.
+
+## Optional raster imagery
+
+Use `npm run package:offline:raster` to include the imported NOAA raster archive
+alongside the vector chart. The default command remains vector-only. The combined
+package is much larger; see [source sizes and mode behavior](raster-chart-view.md).

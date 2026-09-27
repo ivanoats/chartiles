@@ -1,12 +1,17 @@
 """Validate and upload the current chart bundle to R2; dry-run by default."""
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 import re
 import shlex
 import subprocess
+
+
+try:
+    from .chart_manifest import archive_file, validate_version
+except ImportError:
+    from chart_manifest import archive_file, validate_version
 
 
 def bucket_name(value):
@@ -33,21 +38,12 @@ def validated_files(root):
     charts = root / 'web/public/charts'
     manifest_path = charts / 'manifest.json'
     manifest = json.loads(manifest_path.read_text())
+    validate_version(manifest)
     digest = manifest['sha256']
-    if len(digest) != 64 or any(c not in '0123456789abcdef' for c in digest):
-        raise SystemExit('Invalid archive SHA-256 in manifest')
-    archive = charts / f'{digest}.pmtiles'
-    if manifest['pmtiles_url'] != f'./charts/{archive.name}':
-        raise SystemExit('Expected a local content-addressed archive URL')
-    if archive.stat().st_size != manifest['bytes']:
-        raise SystemExit('Archive size does not match manifest')
-    hasher = hashlib.sha256()
-    with archive.open('rb') as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b''):
-            hasher.update(chunk)
-    if hasher.hexdigest() != digest:
-        raise SystemExit('Archive checksum does not match manifest')
+    archive = archive_file(charts, manifest)
     files = [(archive, 'application/octet-stream')]
+    if manifest.get('raster'):
+        files.append((archive_file(charts, manifest['raster'], raster=True), 'application/octet-stream'))
     coverage = [charts / f'{digest}-coverage{suffix}' for suffix in ('.json', '.geojson')]
     if any(path.exists() for path in coverage):
         if not all(path.is_file() for path in coverage):

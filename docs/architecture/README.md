@@ -13,7 +13,12 @@ A fourth C4 level (Code) is deliberately not maintained. It would constrain impl
 
 ## Architectural shape, in one paragraph
 
-ChartTiles is a static-file system with a build pipeline and a thin client. A weekly cloud job pulls NOAA ENC data, runs it through `ogr2ogr` and `tippecanoe`, packages the output as a single PMTiles file, and uploads it to object storage. Clients — either a browser hitting the CDN or a small nginx on a boat hitting a local file — read individual tiles via HTTP range requests directly from the PMTiles archive. There is no GIS server, no database at runtime, and no per-user dynamic computation. All styling and dynamic behavior (depth-shaded contours, day/night palettes, safety-depth highlighting) is computed in the client from a MapLibre style sheet.
+ChartTiles uses a local ENC build pipeline, immutable vector PMTiles, a static
+MapLibre viewer, and read-only HTTP range delivery through R2/Workers or the
+offline Python server. Automated weekly builds and full dynamic nautical
+portrayal are future work. The next milestone adds a separate raster chart view;
+see [raster chart view architecture](raster-chart-view.md). Older diagrams in this
+section include target-state components and should not be read as deployed state.
 
 ## Clean Architecture mapping
 

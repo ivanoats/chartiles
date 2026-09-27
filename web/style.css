@@ -10,3 +10,11 @@
 .coverage-control button {width:auto;padding:0 12px;font:600 12px system-ui}.coverage-control button[aria-pressed="true"] {background:#dbeeff;color:#12558f}
 
 output {display:block;margin:1em 0}aside output {font-size:13px}
+
+[hidden] {display:none !important}
+.chart-modes button {width:auto;padding:0 12px;font:600 13px system-ui}
+.chart-modes button[aria-pressed="true"] {background:#dbeeff;color:#12558f}
+.chart-active .coverage-control {display:none}
+.map-tools button:disabled {opacity:0.4;cursor:default}
+#raster-status {line-height:1.6}
+#raster-warning:empty {display:none}
