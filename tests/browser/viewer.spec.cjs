@@ -37,3 +37,33 @@ test('renders and inspects real tiles with all external requests blocked', async
   expect(errors).toEqual([]);
   expect(ranges).toContain(206);
 });
+
+test('detail view renders sounding labels with no external fonts or sprites', async ({page}) => {
+  const errors = [];
+  const external = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/*', route => {
+    if (new URL(route.request().url()).hostname !== '127.0.0.1') {
+      external.push(route.request().url()); return route.abort();
+    }
+    return route.continue();
+  });
+  await page.goto('/#15/47.681/-122.411');
+  await page.waitForFunction(() => performance.getEntriesByName('chartiles-first-idle').length > 0);
+  await expect(page.locator('#zoom-hint')).toContainText('Zoom 15.0');
+  await expect(page.locator('#status')).not.toContainText('error');
+  await page.screenshot({path: 'build/detail-viewer.png'});
+  expect(errors).toEqual([]);
+  expect(external).toEqual([]);
+});
+
+test('coverage audit can be toggled on the map', async ({page}) => {
+  await page.goto('/');
+  await expect(page.locator('#coverage-status')).toContainText('99 coverage footprints');
+  const button = page.getByRole('button', {name: 'Coverage', exact: true});
+  await button.click();
+  await expect(button).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({path: 'build/coverage-viewer.png'});
+  await button.click();
+  await expect(button).toHaveAttribute('aria-pressed', 'false');
+});

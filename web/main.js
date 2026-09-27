@@ -3,6 +3,8 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import {Protocol} from 'pmtiles';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
+import {installCoverage} from './coverage.js';
+import {detailZoom, installImages} from './portrayal.js';
 
 maplibregl.setWorkerUrl(workerUrl);
 const status = document.querySelector('#status');
@@ -22,21 +24,27 @@ async function start() {
   const points = {SOUNDG: '#47616a', BOYLAT: '#bd4a23', BOYSAW: '#bd4a23', BOYSPP: '#b18a13', BCNLAT: '#ab511f', LIGHTS: '#8e6299', WRECKS: '#b32250', UWTROC: '#b32250', OBSTRN: '#b32250'};
   const add = (id, type, paint, geometry) => {
     if (!manifest.counts[id]) return;
-    layers.push({id, type, source: 'enc', 'source-layer': id, paint,
+    layers.push({id, type, minzoom: detailZoom[id] || 0, source: 'enc', 'source-layer': id, paint,
       ...(geometry ? {filter: ['==', ['geometry-type'], geometry]} : {})});
   };
   for (const [id, color] of Object.entries(fills)) add(id, 'fill', {'fill-color': color, 'fill-opacity': 0.85}, 'Polygon');
   for (const [id, color] of Object.entries(lines)) add(id, 'line', {'line-color': color, 'line-width': id === 'COALNE' ? 2 : 1});
   for (const [id, color] of Object.entries(points)) {
-    add(id, 'circle', {'circle-color': color, 'circle-radius': id === 'SOUNDG' ? 2.5 : 6, 'circle-stroke-color': '#fff', 'circle-stroke-width': 1}, 'Point');
-    // Hazards and aids can also be represented as lines or areas.
-    if (manifest.counts[id]) layers.push({id: `${id}-extent`, type: 'line', source: 'enc', 'source-layer': id,
+    if (!manifest.counts[id]) continue;
+    layers.push({id, type: 'symbol', minzoom: detailZoom[id], source: 'enc', 'source-layer': id,
+      filter: ['==', ['geometry-type'], 'Point'],
+      layout: {'icon-image': id === 'SOUNDG'
+        ? ['concat', 'depth:', ['to-string', ['get', 'depth_m']]] : `aid:${id}`,
+        'icon-allow-overlap': false, 'icon-padding': id === 'SOUNDG' ? 3 : 2}});
+    layers.push({id: `${id}-extent`, type: 'line', minzoom: detailZoom[id], source: 'enc', 'source-layer': id,
       filter: ['!=', ['geometry-type'], 'Point'], paint: {'line-color': color, 'line-width': 2}});
   }
   const bounds = [[manifest.bounds[0], manifest.bounds[1]], [manifest.bounds[2], manifest.bounds[3]]];
   const map = new maplibregl.Map({container: 'map', bounds, fitBoundsOptions: {padding: 25},
-    minZoom: manifest.minzoom, maxZoom: 19,
+    minZoom: manifest.minzoom, maxZoom: 19, hash: true,
     style: {version: 8, sources: {enc: {type: 'vector', url: `pmtiles://${url}`, attribution: 'NOAA ENC · experimental conversion'}}, layers}});
+  installImages(map);
+  map.on('load', () => installCoverage(map, manifest));
   map.once('idle', () => performance.mark('chartiles-first-idle'));
   map.addControl(new maplibregl.NavigationControl());
   map.addControl(new maplibregl.ScaleControl({unit: 'metric'}));
@@ -88,7 +96,7 @@ async function start() {
   map.on('click', event => {
     if (mode !== 'inspect' || !map.isStyleLoaded()) return;
     const features = map.queryRenderedFeatures([[event.point.x - 5, event.point.y - 5], [event.point.x + 5, event.point.y + 5]]);
-    const unique = [...new Map(features.map(f => [f.properties.feature_key, f])).values()];
+    const unique = [...new Map(features.filter(f => f.source === 'enc').map(f => [f.properties.feature_key, f])).values()];
     selection?.remove();
     const message = unique.length ? `${unique.length} feature${unique.length === 1 ? '' : 's'} selected. Details in the inspector.` : 'No feature here. Try another location.';
     selection = new maplibregl.Popup({closeButton: false, closeOnClick: false})
@@ -103,8 +111,12 @@ async function start() {
     input.addEventListener('change', () => {
       for (const id of [name, `${name}-extent`]) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', input.checked ? 'visible' : 'none');
     });
-    label.append(input, ` ${name} (${count})`); document.querySelector('#layers').append(label);
+    label.append(input, ` ${name} (${count})${detailZoom[name] ? ' · z' + detailZoom[name] + '+' : ''}`); document.querySelector('#layers').append(label);
   }
+  const zoomHint = document.querySelector('#zoom-hint');
+  const updateZoomHint = () => { zoomHint.textContent = `Zoom ${map.getZoom().toFixed(1)} · aids z11+ · hazards z12+ · depths z14+. Overlapping symbols may be hidden; zoom in to inspect.`; };
+  map.on('zoomend', updateZoomHint);
+  updateZoomHint();
   document.querySelector('#reset').onclick = () => map.fitBounds(bounds, {padding: 25});
   status.textContent = `Built ${manifest.built_at.slice(0, 10)} · ${(manifest.bytes / 1048576).toFixed(2)} MiB · ${manifest.sources.length} NOAA cells · zooms ${manifest.minzoom}–${manifest.maxzoom}`;
 }

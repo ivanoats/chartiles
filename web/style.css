@@ -6,3 +6,5 @@
 .map-tools button[aria-pressed="true"] {background:#dbeeff;box-shadow:inset 3px 0 #176fc1}
 .map-tools button:hover {background:#edf5fc}
 .map-tools button:focus-visible {outline:3px solid #176fc1;outline-offset:2px}
+
+.coverage-control button {width:auto;padding:0 12px;font:600 12px system-ui}.coverage-control button[aria-pressed="true"] {background:#dbeeff;color:#176fc1}

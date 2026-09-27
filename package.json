@@ -17,7 +17,8 @@
     "test": "python3 -m unittest discover -s tests",
     "test:browser": "playwright test",
     "charts:puget": "python3 pipeline/build.py --config pipeline/puget-sound.json",
-    "benchmark": "node pipeline/benchmark.cjs"
+    "benchmark": "node pipeline/benchmark.cjs",
+    "package:offline": "npm run build && python3 pipeline/package_offline.py"
   },
   "dependencies": {
     "maplibre-gl": "^6.11.2",
