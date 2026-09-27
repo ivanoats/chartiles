@@ -4,13 +4,22 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import shlex
 import subprocess
 
 
+def bucket_name(value):
+    # A deliberately narrow name format prevents option prefixes and path injection.
+    if not re.fullmatch(r'[a-z0-9][a-z0-9-]{1,61}[a-z0-9]', value):
+        raise argparse.ArgumentTypeError(
+            'Bucket must be 3–63 lowercase letters, digits or hyphens, with alphanumeric ends')
+    return value
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--bucket', default='chartiles-charts')
+    parser.add_argument('--bucket', type=bucket_name, default='chartiles-charts')
     parser.add_argument('--upload', action='store_true', help='Write to remote R2')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
