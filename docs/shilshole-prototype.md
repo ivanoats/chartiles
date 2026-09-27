@@ -16,7 +16,7 @@ npm run preview
 
 Open the localhost URL printed by Vite. Acquisition and installation need internet access; the built viewer does not. Keep the local server running when disconnecting the internet. Opening index.html directly through file:// is unsupported. For development use `npm run dev`.
 
-Click the map to inspect original attributes and source cell identifiers. Soundings are dots: their `depth_m` values appear in the inspector, not as chart labels. Hazard areas and lines have outlines. Toggle layers to inspect overlapping features. Grey background means no painted depth/land layer, not verified open water.
+Click the map to inspect original attributes and source cell identifiers. Sounding numbers appear from zoom 14 using their `depth_m` values; attributes remain available in the inspector. Hazard areas and lines have outlines. Toggle layers to inspect overlapping features. Grey background means no painted depth/land layer, not verified open water.
 
 ## Scope and provenance
 
@@ -59,3 +59,11 @@ References: [NOAA downloads](https://www.charts.noaa.gov/ENCs/ENCs.shtml), [GDAL
 ## Manual check outcome
 
 Ivan reported completing the NOAA source spot checks with no discrepancies. The sample count and feature identifiers were not recorded. This report applies to Shilshole only; see the [Puget Sound benchmark](puget-sound-benchmark.md) for the larger-area work.
+
+## Zoom-aware inspection style
+
+The overview shows land and depth areas. Contours and aids appear at zoom 11, hazards and coverage boundaries at zoom 12, and sounding numbers at zoom 14. The layer list displays these thresholds. These are prototype display choices, not S-52 or SCAMIN rules. Collision handling can hide overlapping labels and symbols; a clear-looking view does not establish absence of hazards.
+
+Symbols distinguish buoys (diamond), beacons (triangle), lights (star), wrecks (cross), rocks (plus) and obstructions (square). They do not encode the full source attributes, lateral color, light characteristics or danger classification. Sounding values are displayed in metres without converting datum or rounding to a nautical presentation convention. Images are rasterized from the local system font at runtime, so no remote fonts or sprites are needed. Font appearance may vary by operating system.
+
+The URL hash retains zoom and position for revisiting inspection locations. Coverage review and comparison with a later NOAA edition remain separate work.

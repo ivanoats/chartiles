@@ -35,3 +35,7 @@ These docs assume the reader is comfortable with:
 [Puget Sound expansion](puget-sound-expansion.md) — next implementation steps, coverage decisions and measurement gates.
 
 [Puget Sound benchmark](puget-sound-benchmark.md) — regional selection, measurements and review status.
+
+[Update benchmark](update-benchmark.md) — source revision checks and measured full-replacement size.
+
+[Offline bundle](offline-bundle.md) — package, extract and serve without npm or internet.
