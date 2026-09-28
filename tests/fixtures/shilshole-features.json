@@ -1,0 +1,157 @@
+[
+  {
+    "sourceLayer": "LIGHTS",
+    "properties": {
+      "RCID": 25,
+      "PRIM": 1,
+      "GRUP": 2,
+      "OBJL": 75,
+      "RVER": 1,
+      "AGEN": 550,
+      "FIDN": 105014,
+      "FIDS": 1,
+      "LNAM": "022600019A360001",
+      "CATLIT": "[]",
+      "COLOUR": "[\"3\"]",
+      "EXCLIT": 4,
+      "LITCHR": 2,
+      "SIGGRP": "(1)",
+      "SIGPER": 2.5,
+      "SIGSEQ": "00.3+(02.2)",
+      "SCAMIN": 29999,
+      "SORDAT": "20140527",
+      "SORIND": "US,US,reprt,13thCGD,LNM 21/14",
+      "source_cell": "US5SEAGK",
+      "source_layer": "LIGHTS",
+      "feature_key": "US5SEAGK:LIGHTS:022600019A360001"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -122.4159636,
+        47.6775975
+      ]
+    }
+  },
+  {
+    "sourceLayer": "LIGHTS",
+    "properties": {
+      "RCID": 28,
+      "PRIM": 1,
+      "GRUP": 2,
+      "OBJL": 75,
+      "RVER": 1,
+      "AGEN": 550,
+      "FIDN": 105038,
+      "FIDS": 1,
+      "LNAM": "022600019A4E0001",
+      "CATLIT": "[]",
+      "COLOUR": "[\"4\"]",
+      "EXCLIT": 4,
+      "LITCHR": 2,
+      "SIGGRP": "(1)",
+      "SIGPER": 2.5,
+      "SIGSEQ": "00.3+(02.2)",
+      "SCAMIN": 29999,
+      "SORDAT": "20140527",
+      "SORIND": "US,US,reprt,13thCGD,LNM 21/14",
+      "source_cell": "US5SEAGK",
+      "source_layer": "LIGHTS",
+      "feature_key": "US5SEAGK:LIGHTS:022600019A4E0001"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -122.4148803,
+        47.6794031
+      ]
+    }
+  },
+  {
+    "sourceLayer": "BOYLAT",
+    "properties": {
+      "RCID": 16,
+      "PRIM": 1,
+      "GRUP": 2,
+      "OBJL": 17,
+      "RVER": 1,
+      "AGEN": 550,
+      "FIDN": -100729412,
+      "FIDS": 9999,
+      "LNAM": "0226F9FEFDBC270F",
+      "LNAM_REFS": "[\"022600019A4E0001\"]",
+      "FFPT_RIND": "[2]",
+      "BOYSHP": 4,
+      "CATLAM": 1,
+      "COLOUR": "[\"4\"]",
+      "OBJNAM": "Shilshole Bay Entrance Lighted Buoy 1",
+      "STATUS": "[\"1\"]",
+      "SCAMIN": 29999,
+      "SORDAT": "20140527",
+      "SORIND": "US,US,reprt,13thCGD,LNM 21/14",
+      "source_cell": "US5SEAGK",
+      "source_layer": "BOYLAT",
+      "feature_key": "US5SEAGK:BOYLAT:0226F9FEFDBC270F"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -122.4148803,
+        47.6794031
+      ]
+    }
+  },
+  {
+    "sourceLayer": "BOYLAT",
+    "properties": {
+      "RCID": 17,
+      "PRIM": 1,
+      "GRUP": 2,
+      "OBJL": 17,
+      "RVER": 1,
+      "AGEN": 550,
+      "FIDN": 105013,
+      "FIDS": 1,
+      "LNAM": "022600019A350001",
+      "LNAM_REFS": "[\"022600019A360001\"]",
+      "FFPT_RIND": "[2]",
+      "BOYSHP": 4,
+      "CATLAM": 2,
+      "COLOUR": "[\"3\"]",
+      "OBJNAM": "Shilshole Bay Entrance Lighted Buoy 2",
+      "STATUS": "[\"1\"]",
+      "SCAMIN": 29999,
+      "SORDAT": "20140527",
+      "SORIND": "US,US,reprt,13thcgd,LNM 21/14",
+      "source_cell": "US5SEAGK",
+      "source_layer": "BOYLAT",
+      "feature_key": "US5SEAGK:BOYLAT:022600019A350001"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -122.4159636,
+        47.6775975
+      ]
+    }
+  },
+  {
+    "sourceLayer": "DEPARE",
+    "properties": {
+      "RCID": 428,
+      "PRIM": 3,
+      "GRUP": 1,
+      "OBJL": 42,
+      "RVER": 1,
+      "AGEN": 550,
+      "FIDN": 209083932,
+      "FIDS": 6435,
+      "LNAM": "02260C765E1C1923",
+      "DRVAL1": 9.1,
+      "DRVAL2": 182.8,
+      "source_cell": "US5SEAGK",
+      "source_layer": "DEPARE",
+      "feature_key": "US5SEAGK:DEPARE:02260C765E1C1923"
+    }
+  }
+]

@@ -3,7 +3,8 @@ export const detailZoom = {M_COVR: 12, DEPCNT: 11, SOUNDG: 14, BOYLAT: 11, BOYSA
 export const symbols = {BOYLAT: '◇', BOYSAW: '◇', BOYSPP: '◇', BCNLAT: '△', LIGHTS: '✦', WRECKS: '×', UWTROC: '+', OBSTRN: '□'};
 
 export function installImages(map) {
-  map.on('styleimagemissing', ({id}) => {
+  const addImage = id => {
+    if (map.hasImage(id)) return;
     if (!id.startsWith('depth:') && !id.startsWith('aid:')) return;
     const depth = id.startsWith('depth:');
     const text = depth ? id.slice(6) : symbols[id.slice(4)];
@@ -24,5 +25,9 @@ export function installImages(map) {
     ctx.fillStyle = color;
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
     map.addImage(id, ctx.getImageData(0, 0, canvas.width, canvas.height), {pixelRatio: 2});
+  };
+  map.on('styleimagemissing', ({id}) => addImage(id));
+  map.once('style.load', () => {
+    for (const name of Object.keys(symbols)) addImage(`aid:${name}`);
   });
 }
