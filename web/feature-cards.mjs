@@ -24,7 +24,10 @@ export function describeFeature(feature, candidates = []) {
     const flashing = String(p.LITCHR) === '2';
     title = (linked.length === 1 && linked[0].OBJNAM) || p.OBJNAM || `${colour || 'Unspecified colour'} light`;
     const period = number(p.SIGPER);
-    summary = `${flashing ? decodeAttribute('LITCHR', p.LITCHR) : 'Light characteristic'}${colour ? ' · ' + colour.toLowerCase() : ''}${period > 0 ? ` · every ${period} s` : ''}`;
+    const characteristic = flashing ? decodeAttribute('LITCHR', p.LITCHR) : 'Light characteristic';
+    const colourDescription = colour ? ' · ' + colour.toLowerCase() : '';
+    const periodDescription = period > 0 ? ` · every ${period} s` : '';
+    summary = characteristic + colourDescription + periodDescription;
     if (!flashing) rows.push(['Characteristic code', present(p.LITCHR) ? String(p.LITCHR) : 'Not recorded']);
     if (flashing && colourCodes.length && colourCodes.every(code => Object.hasOwn(abbreviations, code)) && period > 0) {
       rows.push(['Chart notation', `Fl${present(p.SIGGRP) && p.SIGGRP !== '(1)' ? p.SIGGRP : ''} ${colourCodes.map(code => abbreviations[code]).join('')} ${period}s`]);

@@ -30,8 +30,11 @@ export function list(value) {
 
 export function attributeValues(attribute, value) {
   const dictionary = Object.hasOwn(definitions, attribute) ? definitions[attribute] : {};
-  return list(value).map(code => Object.hasOwn(dictionary, code) ? dictionary[code]
-    : attribute === 'COLOUR' ? `Unknown colour (${code})` : `Unknown ${attribute} code (${code})`);
+  return list(value).map(code => {
+    if (Object.hasOwn(dictionary, code)) return dictionary[code];
+    if (attribute === 'COLOUR') return `Unknown colour (${code})`;
+    return `Unknown ${attribute} code (${code})`;
+  });
 }
 
 export function decodeAttribute(attribute, value) {

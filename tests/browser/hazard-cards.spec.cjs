@@ -5,7 +5,7 @@ for (const feature of fixtures) {
     const [lng,lat] = feature.geometry.coordinates;
     await page.goto(`/#${feature.sourceLayer === 'SOUNDG' ? 15 : 18}/${lat}/${lng}`);
     await page.getByRole('button',{name:'Inspect features',exact:true}).click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForFunction(() => performance.getEntriesByName('chartiles-first-idle').length > 0);
     if (feature.sourceLayer === 'SOUNDG') {
       const soundings = page.locator('input[data-layer="SOUNDG"]');
       await soundings.uncheck();
