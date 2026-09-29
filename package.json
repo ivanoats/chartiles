@@ -14,7 +14,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "python3 -m unittest discover -s tests && node --test tests/worker.test.mjs",
+    "test": "python3 -m unittest discover -s tests && node --test tests/*.test.mjs",
     "test:browser": "playwright test",
     "charts:puget": "python3 pipeline/build.py --config pipeline/puget-sound.json",
     "benchmark": "node pipeline/benchmark.cjs",

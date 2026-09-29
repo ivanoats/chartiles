@@ -1,3 +1,4 @@
+import {renderFeatureCards} from './feature-cards.mjs';
 import * as maplibregl from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import {Protocol} from 'pmtiles';
@@ -59,6 +60,8 @@ async function start() {
     installCoverage(map, manifest);
     installChartModes(map, manifest, raster, rasterState, setMode, () => {
       selection?.remove();
+      document.querySelector('#feature-cards').replaceChildren();
+      document.querySelector('#raw-attributes').open = false;
       document.querySelector('#details').textContent = 'Select a feature.';
       document.querySelector('#selection-status').textContent = 'No feature selected.';
     });
@@ -124,6 +127,8 @@ async function start() {
     selection = new maplibregl.Popup({closeButton: false, closeOnClick: false})
       .setLngLat(event.lngLat).setText(message).addTo(map);
     document.querySelector('#selection-status').textContent = message;
+    const buoys = ['BOYLAT', 'BOYSAW', 'BOYSPP'].flatMap(sourceLayer => map.querySourceFeatures('enc', {sourceLayer}));
+    renderFeatureCards(document.querySelector('#feature-cards'), unique, buoys);
     document.querySelector('#details').textContent = unique.length
       ? JSON.stringify(unique.map(f => ({layer: f.sourceLayer, ...f.properties})), null, 2) : 'No feature here. Blank areas do not establish safe water.';
   });

@@ -18,3 +18,12 @@ output {display:block;margin:1em 0}aside output {font-size:13px}
 .map-tools button:disabled {opacity:0.4;cursor:default}
 #raster-status {line-height:1.6}
 #raster-warning:empty {display:none}
+
+.feature-card {border:1px solid #bbc6bd;border-radius:6px;background:#fff;padding:12px;margin:12px 0;overflow-wrap:anywhere}
+.feature-card h3 {font-size:16px;margin:0 0 8px}
+.feature-card p {margin:8px 0}
+.feature-card dl {font-size:12px;margin:0}
+.feature-card dt {font-weight:600;margin-top:8px}
+.feature-card dd {margin:2px 0}
+.feature-card[data-kind="DEPARE"] {background:#edf6fa}
+#raw-attributes {margin:14px 0}#raw-attributes summary {cursor:pointer;font-size:13px;font-weight:600}

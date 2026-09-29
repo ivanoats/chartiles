@@ -40,6 +40,8 @@ These docs assume the reader is comfortable with:
 
 [Offline bundle](offline-bundle.md) — package, extract and serve without npm or internet.
 
+[Readable feature inspection](feature-inspection.md) — light cards, explicit buoy associations, depth-area context, and verification.
+
 ## Next milestone
 
 [Raster chart view plan](raster-chart-plan.md) — add pre-rendered chart imagery alongside vector inspection, with source qualification, offline packaging and pilot acceptance checks.
