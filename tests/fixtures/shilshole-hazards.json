@@ -1,0 +1,92 @@
+[
+  {
+    "sourceLayer": "WRECKS",
+    "properties": {
+      "RCID": 410,
+      "PRIM": 1,
+      "GRUP": 2,
+      "OBJL": 159,
+      "RVER": 1,
+      "AGEN": 550,
+      "FIDN": -363176948,
+      "FIDS": 6435,
+      "LNAM": "0226EA5A5C0C1923",
+      "CATWRK": 2,
+      "QUASOU": [
+        "2"
+      ],
+      "WATLEV": 3,
+      "SORDAT": "20171128",
+      "SORIND": "US,US,reprt,13thCGD,LNM 48/17",
+      "source_cell": "US5SEAGK",
+      "source_layer": "WRECKS",
+      "feature_key": "US5SEAGK:WRECKS:0226EA5A5C0C1923"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -122.4145,
+        47.6766
+      ]
+    }
+  },
+  {
+    "sourceLayer": "UWTROC",
+    "properties": {
+      "RCID": 397,
+      "PRIM": 1,
+      "GRUP": 2,
+      "OBJL": 153,
+      "RVER": 1,
+      "AGEN": 550,
+      "FIDN": -1502062630,
+      "FIDS": 6435,
+      "LNAM": "0226A67857DA1923",
+      "EXPSOU": 2,
+      "VALSOU": 0,
+      "WATLEV": 5,
+      "SORDAT": "19970125",
+      "SORIND": "US,US,graph,Chart 18447",
+      "source_cell": "US5SEAGK",
+      "source_layer": "UWTROC",
+      "feature_key": "US5SEAGK:UWTROC:0226A67857DA1923"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -122.4135616,
+        47.672048
+      ]
+    }
+  },
+  {
+    "sourceLayer": "SOUNDG",
+    "properties": {
+      "RCID": 2308,
+      "PRIM": 1,
+      "GRUP": 2,
+      "OBJL": 129,
+      "RVER": 1,
+      "AGEN": 550,
+      "FIDN": -1160524518,
+      "FIDS": 39953,
+      "LNAM": "0226BAD3CD1A9C11",
+      "SCAMIN": 17999,
+      "SORDAT": "20090422",
+      "SORIND": "US,US,graph,H-12025,DD-18551",
+      "DEPTH": 226.4,
+      "source_cell": "US5SEAGK",
+      "source_layer": "SOUNDG",
+      "feature_key": "US5SEAGK:SOUNDG:0226BAD3CD1A9C11:-122.4671341,47.6529827,226.4",
+      "depth_m": 226.4
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -122.4671341,
+        47.6529827,
+        226.4
+      ]
+    }
+  }
+]
