@@ -34,3 +34,17 @@ test('depth polygon remains an area range and missing endpoints are not zero', (
   assert.match(card.note, /not a sounding/);
   assert.equal(describeFeature({source_layer:'DEPARE', DRVAL1:null, DRVAL2:5}).summary,'Depth range incomplete');
 });
+test('unique linked buoy name precedes light name, including duplicate tile copies', () => {
+  const light = {...fixtures[0], properties: {...fixtures[0].properties, OBJNAM: 'Light-specific name'}};
+  const buoy = fixtures[3];
+  assert.equal(describeFeature(light, [buoy, buoy]).title, buoy.properties.OBJNAM);
+  assert.equal(light.properties.OBJNAM, 'Light-specific name');
+  for (const candidates of [
+    [],
+    [{...buoy, properties: {...buoy.properties, OBJNAM: ''}}],
+    [{...buoy, properties: {...buoy.properties, source_cell: 'OTHER'}}],
+    [buoy, {...buoy, properties: {...buoy.properties, feature_key: 'different', OBJNAM: 'Other buoy'}}],
+  ]) {
+    assert.equal(describeFeature(light, candidates).title, 'Light-specific name');
+  }
+});

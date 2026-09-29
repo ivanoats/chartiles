@@ -21,7 +21,9 @@ the chart update date or a verification of current conditions.
 Buoy titles use an explicit `LNAM_REFS` link from a buoy to the selected light,
 within the same source cell. The viewer searches loaded source tiles, including
 buoy records whose symbols are hidden by collision handling. Duplicate tile
-copies are collapsed. Missing or ambiguous associations use a colour/light title;
+copies are collapsed. A unique linked buoy name takes precedence over the light’s
+own `OBJNAM`. Missing, unnamed, or ambiguous associations fall back to the light’s
+`OBJNAM`, then a colour/light title;
 spatial proximity alone never supplies a buoy name. No archive rebuild is needed.
 
 ## Interpretation boundaries

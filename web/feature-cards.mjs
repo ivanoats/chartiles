@@ -29,7 +29,7 @@ export function describeFeature(feature, candidates = []) {
     const colourCodes = list(p.COLOUR);
     const colour = colourCodes.map(code => colours[code] || `Unknown colour (${code})`).join(' / ');
     const flashing = String(p.LITCHR) === '2';
-    title = p.OBJNAM || (linked.length === 1 && linked[0].OBJNAM) || `${colour || 'Unspecified colour'} light`;
+    title = (linked.length === 1 && linked[0].OBJNAM) || p.OBJNAM || `${colour || 'Unspecified colour'} light`;
     const period = number(p.SIGPER);
     summary = `${flashing ? 'Flashing' : 'Light characteristic'}${colour ? ' · ' + colour.toLowerCase() : ''}${period > 0 ? ` · every ${period} s` : ''}`;
     if (!flashing) rows.push(['Characteristic code', present(p.LITCHR) ? String(p.LITCHR) : 'Not recorded']);
