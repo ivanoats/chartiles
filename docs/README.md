@@ -42,8 +42,14 @@ These docs assume the reader is comfortable with:
 
 [Readable feature inspection](feature-inspection.md) — light cards, explicit buoy associations, depth-area context, and verification.
 
-## Next milestone
+## Current work
 
-[Raster chart view plan](raster-chart-plan.md) — add pre-rendered chart imagery alongside vector inspection, with source qualification, offline packaging and pilot acceptance checks.
+[Implementation plan](implementation-plan.md) — current inspection, association, update, and coverage slices with acceptance gates.
+
+[Njord implementation lessons](njord-implementation-lessons.md) — source review informing the sequence.
+
+[Business-plan review](business-plan-review.md) — customer and revenue assumptions to test.
+
+[Raster chart view plan](raster-chart-plan.md) — original raster milestone and acceptance checks.
 
 [Raster chart view](raster-chart-view.md) — implemented modes, source measurements, import and release instructions.

@@ -1,16 +1,9 @@
-// Deliberately small S-57 vocabulary: unsupported values remain available verbatim.
-export function list(value) {
-  if (value == null || value === '') return [];
-  if (Array.isArray(value)) return value.map(String);
-  try { const parsed = JSON.parse(value); if (Array.isArray(parsed)) return parsed.map(String); } catch {}
-  return [String(value)];
-}
-const colours = {'1': 'White', '3': 'Red', '4': 'Green', '6': 'Yellow'};
+import {list, attributeValues, decodeAttribute, numericValue as number} from './s57-attributes.mjs';
+export {list} from './s57-attributes.mjs';
 const abbreviations = {'1': 'W', '3': 'R', '4': 'G', '6': 'Y'};
 const props = feature => feature.properties || feature;
 const layer = feature => feature.sourceLayer || props(feature).source_layer || props(feature).layer;
 const present = value => value !== undefined && value !== null && value !== '';
-const number = value => present(value) && Number.isFinite(Number(value)) ? Number(value) : null;
 
 export function describeFeature(feature, candidates = []) {
   const p = props(feature);
@@ -27,13 +20,16 @@ export function describeFeature(feature, candidates = []) {
         && b.source_cell === p.source_cell && p.LNAM && list(b.LNAM_REFS).includes(p.LNAM);
     }).map(candidate => [props(candidate).feature_key || props(candidate).LNAM, props(candidate)])).values()];
     const colourCodes = list(p.COLOUR);
-    const colour = colourCodes.map(code => colours[code] || `Unknown colour (${code})`).join(' / ');
+    const colour = attributeValues('COLOUR', p.COLOUR).join(' / ');
     const flashing = String(p.LITCHR) === '2';
     title = (linked.length === 1 && linked[0].OBJNAM) || p.OBJNAM || `${colour || 'Unspecified colour'} light`;
     const period = number(p.SIGPER);
-    summary = `${flashing ? 'Flashing' : 'Light characteristic'}${colour ? ' · ' + colour.toLowerCase() : ''}${period > 0 ? ` · every ${period} s` : ''}`;
+    const characteristic = flashing ? decodeAttribute('LITCHR', p.LITCHR) : 'Light characteristic';
+    const colourDescription = colour ? ' · ' + colour.toLowerCase() : '';
+    const periodDescription = period > 0 ? ` · every ${period} s` : '';
+    summary = characteristic + colourDescription + periodDescription;
     if (!flashing) rows.push(['Characteristic code', present(p.LITCHR) ? String(p.LITCHR) : 'Not recorded']);
-    if (flashing && colourCodes.length && colourCodes.every(code => abbreviations[code]) && period > 0) {
+    if (flashing && colourCodes.length && colourCodes.every(code => Object.hasOwn(abbreviations, code)) && period > 0) {
       rows.push(['Chart notation', `Fl${present(p.SIGGRP) && p.SIGGRP !== '(1)' ? p.SIGGRP : ''} ${colourCodes.map(code => abbreviations[code]).join('')} ${period}s`]);
     }
     if (present(p.SIGGRP)) rows.push(['Signal group', String(p.SIGGRP)]);
@@ -43,6 +39,15 @@ export function describeFeature(feature, candidates = []) {
     else if (present(p.SIGSEQ)) rows.push(['Signal sequence', String(p.SIGSEQ)]);
     if (linked.length === 1 && linked[0].OBJNAM) rows.push(['Buoy association', 'Explicit ENC reference']);
     else note = 'Buoy identity is not established by this selection.';
+  } else if (['UWTROC', 'WRECKS', 'SOUNDG'].includes(kind)) {
+    const names = {UWTROC: 'Rock', WRECKS: 'Wreck', SOUNDG: 'Sounding'};
+    title = p.OBJNAM || names[kind];
+    const depth = number(kind === 'SOUNDG' ? p.depth_m : p.VALSOU);
+    summary = depth === null ? 'Depth not recorded' : `${depth} m charted depth`;
+    if (kind !== 'SOUNDG') rows.push(['Water-level effect', decodeAttribute('WATLEV', p.WATLEV)]);
+    if (kind === 'WRECKS') rows.push(['Recorded wreck category', decodeAttribute('CATWRK', p.CATWRK)]);
+    rows.push(['Recorded sounding quality', decodeAttribute('QUASOU', p.QUASOU)]);
+    note = 'Recorded chart data, not current water depth or a vessel-clearance assessment.';
   } else if (kind === 'DEPARE') {
     title = 'Surrounding depth area';
     const low = number(p.DRVAL1), high = number(p.DRVAL2);

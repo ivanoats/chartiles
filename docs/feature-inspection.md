@@ -2,8 +2,8 @@
 
 The inspector presents light characteristics above expandable raw ENC attributes.
 Depth areas appear in separate cards and are labeled as polygon ranges, not point
-soundings or current water depth. Other feature types retain a basic card and raw
-attributes.
+soundings or current water depth. Rocks, wrecks, and soundings have readable
+cards; other feature types retain a basic card and raw attributes.
 
 ## First supported examples
 
@@ -40,15 +40,49 @@ References: [S-57 light characteristic](https://docs.teledynecaris.com/s-57/attr
 [signal sequence](https://docs.teledynecaris.com/s-57/attribut/sigseq.htm),
 and [depth area](https://docs.teledynecaris.com/s-57/object/depare.htm).
 
+## Shared vocabulary and hazard cards
+
+`web/s57-attributes.mjs` defines supported vocabulary version 1. Both light and
+hazard cards consume it. It handles scalar values, arrays, and stringified arrays;
+unknown codes remain visible. Numeric parsing keeps missing values separate from
+zero and negative charted depths.
+
+- Rocks and wrecks show `WATLEV` (water-level effect) and `VALSOU` when recorded.
+- Wrecks show `CATWRK` as the **recorded wreck category**, not a new assessment.
+- Soundings use the point depth retained as `depth_m` by our pipeline.
+- All three show recorded `QUASOU` qualifications, including uncertain or reported
+  values. Missing quality is labeled "Not recorded", not assumed reliable.
+- Depths remain chart values, not current water depth or vessel clearance. The
+  original values remain in raw attributes even when an unknown code is present.
+
+Mappings were checked on 2026-09-29 against
+[GDAL's S-57 attribute dictionary](https://github.com/OSGeo/gdal/blob/9a119bc210ec54ffd76a34179c3ef28cc44a0421/ogr/ogrsf_frmts/s57/data/s57expectedinput.csv)
+(attribute IDs 71, 125, and 187), and the
+[CARIS WATLEV reference](https://docs.teledynecaris.com/s-57/attribut/watlev.htm)
+including code 7. Display labels use sentence case, shorten the hull/superstructure
+wording, and correct the dictionary's spelling of "regularly". No Njord source
+code or symbol assets are included.
+
 ## Verification
 
 `npm test` exercises the retained examples, cross-cell and ambiguous associations,
 unknown codes, and incomplete depth ranges. `npm run test:browser` clicks both
 lights in the local Puget Sound tiles and checks titles, timing, depth separation,
-raw details, and clearing the selection when changing display modes.
+raw details, and clearing the selection when changing display modes. Additional
+browser cases inspect a real wreck with unknown depth, an awash rock with zero
+charted depth, and a sounding from the retained `US5SEAGK` cell.
 
 Aid icons are preloaded when the style loads so switching from initially hidden
 vector layers produces inspectable symbols. Existing collision rules still apply.
 
-Next candidates are wrecks, rocks, and soundings, followed by light ranges and
-sectors with explicitly verified attribute meanings.
+Next is build-time aid association enrichment, as sequenced in the implementation
+plan. Light ranges and sectors remain conditional on pilot feedback.
+
+## Observed rendering limitation
+
+Some sounding labels were absent on initial views even though the tile feature
+and generated label image were loaded. Toggling the SOUNDG layer off and on made
+the tested label selectable. The sounding browser regression uses that workflow
+at zoom 15; it verifies the new card, not a fix for initial label placement.
+This remains a separate portrayal/picking defect. Rocks and wrecks are tested
+without toggling their layers. Existing symbol collision rules also still apply.

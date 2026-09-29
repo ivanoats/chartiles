@@ -48,3 +48,29 @@ test('unique linked buoy name precedes light name, including duplicate tile copi
     assert.equal(describeFeature(light, candidates).title, 'Light-specific name');
   }
 });
+
+test('rock card preserves zero depth and recorded water-level effect', () => {
+  const card = describeFeature({source_layer:'UWTROC', VALSOU:0, WATLEV:5, QUASOU:'["3","999"]'});
+  assert.equal(card.title, 'Rock');
+  assert.equal(card.summary, '0 m charted depth');
+  assert.deepEqual(card.rows.slice(0,2), [['Water-level effect','Awash'], ['Recorded sounding quality','Doubtful sounding; Unknown QUASOU code (999)']]);
+});
+test('wreck card distinguishes recorded classification from a clearance assessment', () => {
+  const card = describeFeature({source_layer:'WRECKS', OBJNAM:'Example wreck', CATWRK:1, WATLEV:3, VALSOU:12.4});
+  assert.equal(card.title, 'Example wreck');
+  assert.equal(card.summary, '12.4 m charted depth');
+  assert.ok(card.rows.some(([k,v]) => k === 'Recorded wreck category' && v === 'Non-dangerous wreck'));
+  assert.match(card.note, /not current water depth or a vessel-clearance assessment/);
+});
+test('hazards do not invent missing depths or silently discard unknown categories', () => {
+  const card = describeFeature({source_layer:'WRECKS', VALSOU:' ', CATWRK:999});
+  assert.equal(card.summary, 'Depth not recorded');
+  assert.ok(card.rows.some(([k,v]) => k === 'Recorded wreck category' && v === 'Unknown CATWRK code (999)'));
+  assert.ok(card.rows.some(([k,v]) => k === 'Recorded sounding quality' && v === 'Not recorded'));
+});
+test('soundings use normalized point depth, preserve negative values and reported quality', () => {
+  const card = describeFeature({source_layer:'SOUNDG', depth_m:-1.2, QUASOU:[8,9]});
+  assert.equal(card.summary, '-1.2 m charted depth');
+  assert.equal(card.rows[0][1], 'Value reported (not surveyed); Value reported (not confirmed)');
+  assert.equal(describeFeature({source_layer:'SOUNDG', DRVAL1:4}).summary, 'Depth not recorded');
+});

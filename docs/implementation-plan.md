@@ -1,12 +1,82 @@
 # Implementation Plan
 
-## Current sequencing update — 2026-09-27
+## Current execution plan — 2026-09-29
 
-The next milestone is the [raster chart view plan](raster-chart-plan.md), as
-recorded in [ADR 0009](adr/0009-raster-chart-view-with-vector-inspection.md).
-It precedes further S-52-inspired styling in Phase 2 below. The original phase
-estimates and navigation-oriented success metric are historical planning targets;
-the new milestone uses explicit inspection and display acceptance checks.
+This sequence supersedes the historical phase order below. The Puget Sound
+pipeline, raster display, offline packaging, and light inspection cards are
+implemented. The next objective is a useful, trustworthy inspection pilot and an
+external developer integration, not a complete S-52 renderer.
+
+The [Njord source review](njord-implementation-lessons.md) informs the technical
+work. The [business-plan critique](business-plan-review.md) records the assumptions
+that still need customer validation. Neither changes the static-serving decision.
+
+### Slice 1 — Shared attributes and hazard inspection (implemented locally)
+
+- Extract reusable, versioned S-57 decoding from the light card implementation.
+- Add rock (`UWTROC`), wreck (`WRECKS`), and sounding (`SOUNDG`) cards.
+- Show recorded water-level effect, wreck category, depth, and sounding quality
+  when present. Describe classifications as recorded chart data, not a conclusion
+  about whether a vessel can pass safely.
+- Keep missing values distinct from zero, preserve unknown codes, support arrays
+  and stringified arrays, and retain expandable raw attributes and source context.
+- Validate meanings against source definitions independently of Njord.
+
+Acceptance: existing light cases pass; known, missing, zero, negative, and uncertain
+hazard depths have regression coverage; browser tests inspect real chart features
+and verify readable cards alongside raw data. No archive rebuild is required.
+
+Pilot defect backlog: investigate absent sounding labels on initial views.
+Toggling SOUNDG off/on makes the tested label selectable. The first-slice
+sounding browser check uses this workflow at zoom 15; initial label placement
+remains unresolved and should be fixed before the pilot.
+
+### Slice 2 — Build-time aid associations
+
+Resolve unambiguous light/buoy links from explicit references within a source cell
+before tiling. Preserve the original attributes plus related feature keys and
+names. Continue reading older archives that lack enrichment.
+
+Acceptance: identity remains stable across zoom and tile boundaries; missing,
+ambiguous, duplicate, and cross-cell references have tests; version the enriched
+schema and compare output before publishing a rebuilt archive. Add a static
+feature index only if the pilot requires persistent selected-feature links.
+
+### Slice 3 — Verified managed updates
+
+Extend the existing catalog checker into a candidate-release workflow: detect
+changed and newly relevant cells, flag withdrawals, build, validate, and publish
+the manifest last. Expose installed release, source revisions, last successful
+check, coverage, and download size. Retain the prior release for rollback.
+
+Acceptance: unchanged inputs are a no-op; missed runs catch up; incomplete catalogs
+and failed builds cannot replace a usable release; distinguish changed source
+cells from binary archive deltas. Required before promising managed updates.
+
+### Slice 4 — Multi-scale coverage policy
+
+Define preferred-cell selection and build-time clipping before introducing more
+chart usage bands or expanding geographically. Test overlapping harbor/coastal
+cells for duplicate features, seams, and missing aids.
+
+Acceptance: deterministic selection, preserved provenance, and reviewed overlap
+fixtures. Do not claim that global layer zoom thresholds implement source scale.
+
+### Later, conditional on pilot feedback
+
+Light heights/ranges/sectors, day/dusk/night palettes, and richer vector symbols.
+Keep user-specific display settings out of shared static archives where possible.
+A complete S-52 engine, dynamic database tile server, and subscription machinery
+remain outside this sequence.
+
+### Business track and stop conditions
+
+In parallel, interview five marine-web developers and observe three sailor
+sessions. Seek one external integration and a bounded paid pilot. Record developer
+budget/maintenance problems separately from sailor usability feedback. Review
+evidence after 30 days; prioritize repeated problems, not feature completeness.
+Unawarded grants are not operating runway. Production publication and outreach
+remain separate actions from local implementation.
 
 
 A phased plan from empty repo to v1.0. Each phase has a scope, deliverables, success metric, and an exit gate. Dates are indicative; gates are not.
