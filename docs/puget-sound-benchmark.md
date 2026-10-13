@@ -26,6 +26,11 @@ Puget Sound manual review is outstanding. It should include the transition betwe
 
 ## Measurements
 
+For the October 12 compiler comparison using fresh NOAA inputs, see
+[tylertoo benchmark](tylertoo-benchmark.md). Both compilers passed the
+maximum-zoom preservation checks; the current tippecanoe compilation produced
+a smaller archive with lower peak memory.
+
 The validated regional archive is **56,891,449 bytes (54.26 MiB)**, with **47,262 extracted features**, including **28,103 soundings**. All extracted feature identities survived at zoom 16, and sounding depths matched. Extraction, compilation and validation from retained source ZIPs took **122.18 seconds**; this excludes downloading the inputs.
 
 | Local browser measurement | Shilshole | Puget Sound |
