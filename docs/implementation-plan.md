@@ -193,8 +193,10 @@ Next review date: to be set.
 
 ## Decisions since the 2026-09-29 revision
 
-- 2026-10-12: keep tippecanoe for the Puget Sound pipeline. tylertoo matched on
-  fidelity but was slower and produced a larger archive in a single local run. See
+- 2026-10-12: keep tippecanoe for the Puget Sound pipeline. tylertoo passed the
+  maximum-zoom identity, depth, layer, and scalar-property checks but was slower
+  and produced a larger archive in a single local run. Geometry, portrayal, and
+  lower-zoom fidelity remain unvalidated. See
   [tylertoo-benchmark.md](tylertoo-benchmark.md) and
   [PR #6](https://github.com/ivanoats/chartiles/pull/6). This work was not on the
   plan.
