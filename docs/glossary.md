@@ -57,7 +57,7 @@ ChartTiles sits at the intersection of marine hydrography, geospatial tooling, a
 ## Tile pipeline shorthand used in this repo
 
 - `pnw.pmtiles` — the v0.1 distribution artifact. Pacific Northwest only, single file, ~500 MB target.
-- "The pipeline" — the build process documented in [implementation-plan.md, Phase 1](implementation-plan.md).
+- "The pipeline" — the build process documented in [implementation-plan-history.md, Phase 1](implementation-plan-history.md).
 - "The viewer" — the web client in `web/`.
 - "The onboard rig" — the Raspberry Pi or mini-PC running locally at the nav station.
 

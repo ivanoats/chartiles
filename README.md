@@ -59,7 +59,7 @@ chartiles/
 
 Start with [docs/README.md](docs/README.md) for the full index. Highlights:
 
-- [docs/implementation-plan.md](docs/implementation-plan.md) — phased v0 → v1 plan with deliverables and exit gates
+- [docs/implementation-plan.md](docs/implementation-plan.md) — current slices, status, and acceptance gates
 - [docs/business-plan.md](docs/business-plan.md) — market, customers, revenue model, KPIs
 - [docs/roadmap.md](docs/roadmap.md) — 18-month timeline with funding strategy
 - [docs/architecture/](docs/architecture/) — system context, containers, components, data flows
