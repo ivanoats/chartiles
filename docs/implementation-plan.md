@@ -17,8 +17,8 @@ disagrees with this file, this file wins.
 | Item | Status | Reference |
 | --- | --- | --- |
 | Slice 1 — Shared attributes and hazard inspection | Done, merged 2026-09-29 | [PR #4](https://github.com/ivanoats/chartiles/pull/4) |
-| Slice 1.1 — Sounding labels on initial view | Implemented locally, pending PR | `web/portrayal.js` |
-| Slice 1.2 — Continuous integration and license | Not started | — |
+| Slice 1.1 — Sounding labels on initial view | Done, merged 2026-11-14 | [PR #9](https://github.com/ivanoats/chartiles/pull/9) |
+| Slice 1.2 — Continuous integration and license | Implemented locally, pending GitHub verification | [CI workflow](../.github/workflows/ci.yml) |
 | Business review | Overdue, was due 2026-10-29 | [Evidence log](#evidence-log) |
 | Slice 2 — Build-time aid associations | Not started | — |
 | Slice 3 — Verified managed updates | Not started; catalog checker exists | `pipeline/check_updates.py` |
@@ -94,6 +94,12 @@ the repository's license state contradicts
 
 Acceptance: a pull request with a failing unit test cannot show green; the license
 in `package.json`, the `LICENSE` file, and ADR-0008 agree.
+
+The CI workflow runs Python and JavaScript unit tests and the Chromium suite on
+pull requests. The [browser fixtures](../tests/fixtures/README.md) contain small
+extracts of both chart archives, so the browser job runs without live chart
+downloads. To enforce passing tests at merge, make `Unit tests` and `Browser tests`
+required status checks for `main` after their first GitHub run.
 
 ## Slice 2 — Build-time aid associations
 

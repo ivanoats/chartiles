@@ -60,9 +60,10 @@ test('detail view renders sounding labels with no external fonts or sprites', as
 });
 
 test('coverage audit can be toggled on the map', async ({page}) => {
+  const manifest = await (await page.request.get('/charts/manifest.json')).json();
   await page.goto('/');
   await page.getByRole('button', {name: 'Inspect features', exact: true}).click();
-  await expect(page.locator('#coverage-status')).toContainText('99 coverage footprints');
+  await expect(page.locator('#coverage-status')).toContainText(`${manifest.sources.length} coverage footprints`);
   const button = page.getByRole('button', {name: 'Coverage', exact: true});
   await button.click();
   await expect(button).toHaveAttribute('aria-pressed', 'true');

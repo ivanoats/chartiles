@@ -100,7 +100,7 @@ Contribution guidelines will be added before v0.1. In the meantime:
 
 ## License
 
-MIT — see [LICENSE](LICENSE) (to be added).
+MIT — see [LICENSE](LICENSE).
 
 NOAA chart data is in the public domain. We attribute NOAA in the viewer chrome and in PMTiles metadata as a matter of credit and provenance even though no attribution is legally required.
 

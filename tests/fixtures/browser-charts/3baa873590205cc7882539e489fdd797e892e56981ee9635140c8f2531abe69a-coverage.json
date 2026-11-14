@@ -1,0 +1,9 @@
+{
+  "cells": 2,
+  "rectangle_km2": 25.031283839781967,
+  "covered_km2": 25.031283839778105,
+  "uncovered_km2": 0.0,
+  "overlap_pairs": [],
+  "limitations": "Coverage footprints only. Uncovered area includes land. No conclusion about water gaps, survey accuracy or feature agreement at seams.",
+  "archive_sha256": "3baa873590205cc7882539e489fdd797e892e56981ee9635140c8f2531abe69a"
+}

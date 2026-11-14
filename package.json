@@ -2,7 +2,7 @@
   "name": "chartiles",
   "version": "0.0.1",
   "description": "A better way to serve nautical charts",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "author": "Ivan Storck",
   "type": "commonjs",
   "main": "index.js",
