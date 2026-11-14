@@ -26,7 +26,9 @@ export function installImages(map) {
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
     map.addImage(id, ctx.getImageData(0, 0, canvas.width, canvas.height), {pixelRatio: 2});
   };
-  map.on('styleimagemissing', ({id}) => addImage(id));
+  // Resolve images before MapLibre returns a tile worker's image dependencies.
+  // styleimagemissing is a notification after that response is assembled.
+  map.setMissingStyleImageResolver(addImage);
   map.once('style.load', () => {
     for (const name of Object.keys(symbols)) addImage(`aid:${name}`);
   });

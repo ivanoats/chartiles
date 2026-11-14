@@ -75,14 +75,20 @@ charted depth, and a sounding from the retained `US5SEAGK` cell.
 Aid icons are preloaded when the style loads so switching from initially hidden
 vector layers produces inspectable symbols. Existing collision rules still apply.
 
-Next is build-time aid association enrichment, as sequenced in the implementation
-plan. Light ranges and sectors remain conditional on pilot feedback.
+Further aid association enrichment is subject to the business review and
+sequencing in the implementation plan. Light ranges and sectors remain
+conditional on pilot feedback.
 
-## Observed rendering limitation
+## Initial label placement
 
-Some sounding labels were absent on initial views even though the tile feature
-and generated label image were loaded. Toggling the SOUNDG layer off and on made
-the tested label selectable. The sounding browser regression uses that workflow
-at zoom 15; it verifies the new card, not a fix for initial label placement.
-This remains a separate portrayal/picking defect. Rocks and wrecks are tested
-without toggling their layers. Existing symbol collision rules also still apply.
+Fixed locally on 2026-11-14: sounding label images were generated in the
+`styleimagemissing` event, after MapLibre had assembled its image response to the
+tile worker. Toggling `SOUNDG` forced another layout with the images now available.
+The generator now uses MapLibre's
+[`setMissingStyleImageResolver()`](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#setmissingstyleimageresolver),
+which resolves missing images before that response is returned.
+
+The browser regression selects the fixture sounding on fresh loads at zooms
+14, 15, 16, 17, and 18 without touching the layer toggle. Rocks, wrecks, and buoy
+cards also pass. Existing symbol collision rules still apply, so overlapping
+labels can still be hidden; this fix does not force every sounding to display.
