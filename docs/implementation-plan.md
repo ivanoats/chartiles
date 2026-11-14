@@ -18,7 +18,7 @@ disagrees with this file, this file wins.
 | --- | --- | --- |
 | Slice 1 — Shared attributes and hazard inspection | Done, merged 2026-09-29 | [PR #4](https://github.com/ivanoats/chartiles/pull/4) |
 | Slice 1.1 — Sounding labels on initial view | Done, merged 2026-11-14 | [PR #9](https://github.com/ivanoats/chartiles/pull/9) |
-| Slice 1.2 — Continuous integration and license | Implemented locally, pending GitHub verification | [CI workflow](../.github/workflows/ci.yml) |
+| Slice 1.2 — Continuous integration and license | CI verified on GitHub | [PR #10](https://github.com/ivanoats/chartiles/pull/10) |
 | Business review | Overdue, was due 2026-10-29 | [Evidence log](#evidence-log) |
 | Slice 2 — Build-time aid associations | Not started | — |
 | Slice 3 — Verified managed updates | Not started; catalog checker exists | `pipeline/check_updates.py` |
@@ -98,8 +98,8 @@ in `package.json`, the `LICENSE` file, and ADR-0008 agree.
 The CI workflow runs Python and JavaScript unit tests and the Chromium suite on
 pull requests. The [browser fixtures](../tests/fixtures/README.md) contain small
 extracts of both chart archives, so the browser job runs without live chart
-downloads. To enforce passing tests at merge, make `Unit tests` and `Browser tests`
-required status checks for `main` after their first GitHub run.
+downloads. The [ruleset for `main`](https://github.com/ivanoats/chartiles/rules/27277677)
+requires the `Unit tests` and `Browser tests` status checks.
 
 ## Slice 2 — Build-time aid associations
 

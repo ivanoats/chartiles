@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.10'
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm test
 
   browser-tests:
@@ -35,8 +35,8 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps --only-shell chromium
+      - run: npm ci --ignore-scripts
+      - run: ./node_modules/.bin/playwright install --with-deps --only-shell chromium
       - run: npm run build
       - name: Install chart fixtures
         run: cp -R tests/fixtures/browser-charts dist/charts

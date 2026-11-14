@@ -11,8 +11,8 @@ content-addressed and together take about 1.4 MiB. The bundle is for tests only.
 A clean checkout can run the same tests as CI with these commands:
 
 ```sh
-npm ci
-npx playwright install chromium
+npm ci --ignore-scripts
+./node_modules/.bin/playwright install chromium
 npm run build
 cp -R tests/fixtures/browser-charts dist/charts
 npm run test:browser -- --workers=1
