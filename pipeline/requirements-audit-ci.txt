@@ -1,0 +1,13 @@
+# Python 3.12 Linux wheels for CI (x86_64 and aarch64).
+# Keep direct dependency versions in sync with requirements-audit.txt.
+certifi==2026.10.23 \
+    --hash=sha256:e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1
+numpy==2.5.4 \
+    --hash=sha256:fbde6962867ee75b48b0ee29b2b9372ec5d617799dbaf38e82dc0596f2f7738a \
+    --hash=sha256:fe4d21ab149f15e4e6043dfb0de87e6e5f34ac176cde83060e9802981fca2ac2
+pyproj==3.7.2 \
+    --hash=sha256:1edc34266c0c23ced85f95a1ee8b47c9035eae6aca5b6b340327250e8e281630 \
+    --hash=sha256:c203101d1dc3c038a56cff0447acc515dd29d6e14811406ac539c21eed422b2a
+shapely==2.1.2 \
+    --hash=sha256:1e7d4d7ad262a48bb44277ca12c7c78cb1b0f56b32c10734ec9a1d30c0b0c54b \
+    --hash=sha256:0bd308103340030feef6c111d3eb98d50dc13feea33affc8a6f9fa549e9458a3
