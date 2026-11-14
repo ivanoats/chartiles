@@ -24,7 +24,9 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm test
       - name: Install coverage audit dependencies
-        run: 'python3 -m pip install --only-binary=:all: -r pipeline/requirements-audit.txt'
+        run: >-
+          python3 -m pip install --only-binary=:all: --require-hashes
+          -r pipeline/requirements-audit-ci.txt
       - name: Run coverage audit tests
         run: python3 -m unittest discover -s tests/audit
 
