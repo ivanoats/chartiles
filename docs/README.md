@@ -6,7 +6,8 @@ This directory is the canonical reference for ChartTiles' direction, architectur
 
 | Path | What it covers |
 | --- | --- |
-| [implementation-plan.md](implementation-plan.md) | Phased build plan from v0 scaffolding to v1.0 |
+| [implementation-plan.md](implementation-plan.md) | Current slices, status, and acceptance gates |
+| [implementation-plan-history.md](implementation-plan-history.md) | Superseded Phase 0–6 plan from v0 scaffolding to v1.0 |
 | [business-plan.md](business-plan.md) | Strategic plan: market, customers, competition, revenue, KPIs |
 | [roadmap.md](roadmap.md) | 18-month timeline tied to sustainability milestones (grants, hosted tier, consulting) |
 | [glossary.md](glossary.md) | Maritime, GIS, and tile-format terminology |
