@@ -17,7 +17,7 @@ disagrees with this file, this file wins.
 | Item | Status | Reference |
 | --- | --- | --- |
 | Slice 1 — Shared attributes and hazard inspection | Done, merged 2026-09-29 | [PR #4](https://github.com/ivanoats/chartiles/pull/4) |
-| Slice 1.1 — Sounding labels on initial view | Open, next | — |
+| Slice 1.1 — Sounding labels on initial view | Implemented locally, pending PR | `web/portrayal.js` |
 | Slice 1.2 — Continuous integration and license | Not started | — |
 | Business review | Overdue, was due 2026-10-29 | [Evidence log](#evidence-log) |
 | Slice 2 — Build-time aid associations | Not started | — |
@@ -68,9 +68,12 @@ and verify readable cards alongside raw data. No archive rebuild is required.
 
 ## Slice 1.1 — Sounding labels on initial view
 
-Sounding labels are absent on initial views. Toggling `SOUNDG` off and on makes
-the tested label selectable, and `tests/browser/hazard-cards.spec.cjs` relies on
-that workaround at zoom 15. Find the cause and fix initial label placement.
+Fixed locally on 2026-11-14. The `styleimagemissing` event generated label images
+after MapLibre had assembled the tile worker response. Using
+`setMissingStyleImageResolver()` supplies those images before the response.
+The browser regression now selects the fixture sounding on fresh loads at each
+zoom from 14 through 18 without toggling `SOUNDG`. All 16 browser tests pass,
+including the existing buoy, rock, and wreck checks. Collision rules are unchanged.
 
 Acceptance: a sounding label is selectable on first load at zoom 14 and above
 without touching the layer toggle; the toggle workaround is removed from the
