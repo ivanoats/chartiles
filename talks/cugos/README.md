@@ -33,8 +33,8 @@ For an offline copy:
   to start the timer immediately.
 
 Edit `index.html`, then run `python3 talks/cugos/build.py` from the repo root
-to regenerate the offline file. The source page and `assets/` can also be
-served together as static files. The talk is independent of the main site build.
+to regenerate the offline file. The hosted site build (`npm run build:site`) publishes the source page and
+its images at `/cugos/`.
 
 ## Sources and credits
 
