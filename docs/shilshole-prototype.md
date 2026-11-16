@@ -31,6 +31,7 @@ The chosen object classes are a subset of the ENC. Features outside the rectangl
 ```bash
 npm test
 npx playwright install chromium
+npm run build:site
 npm run test:browser
 ```
 

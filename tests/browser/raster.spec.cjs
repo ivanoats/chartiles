@@ -12,7 +12,7 @@ test('raster displays offline and switches modes without moving the camera', asy
   const manifest = await (await page.request.get('/charts/manifest.json')).json();
   test.skip(!manifest.raster, 'Import NOAA raster fixture first');
   page.on('response', r => { if (r.url().includes(manifest.raster.sha256)) ranges.push(r.status()); });
-  await page.goto('/#14/47.681/-122.411');
+  await page.goto('/inspect.html#14/47.681/-122.411');
   const chart = page.getByRole('button', {name:'Chart view',exact:true});
   const features = page.getByRole('button', {name:'Inspect features',exact:true});
   await expect(chart).toHaveAttribute('aria-pressed','true');
@@ -41,7 +41,7 @@ test('failed raster offers inspection and vector-only manifests remain usable', 
   const manifest = await (await page.request.get('/charts/manifest.json')).json();
   test.skip(!manifest.raster, 'Import NOAA raster fixture first');
   await page.route(`**/${manifest.raster.sha256}.pmtiles`, route => route.fulfill({status:404,body:'missing'}));
-  await page.goto('/#14/47.681/-122.411');
+  await page.goto('/inspect.html#14/47.681/-122.411');
   await expect(page.locator('#raster-status')).toContainText('unavailable');
   await page.getByRole('button',{name:'Inspect features',exact:true}).click();
   await expect(page.locator('#status')).toContainText('NOAA cells');
@@ -56,9 +56,9 @@ test('failed raster offers inspection and vector-only manifests remain usable', 
 test('overzoom and out-of-bounds imagery are labeled', async ({page}) => {
   const manifest = await (await page.request.get('/charts/manifest.json')).json();
   test.skip(!manifest.raster, 'Import NOAA raster fixture first');
-  await page.goto('/#18/47.681/-122.411');
+  await page.goto('/inspect.html#18/47.681/-122.411');
   await expect(page.locator('#raster-status')).toContainText('Overzoom');
-  await page.goto('/#12/46/-122');
+  await page.goto('/inspect.html#12/46/-122');
   await expect(page.locator('#raster-status')).toContainText('outside the raster archive bounds');
 });
 
@@ -66,7 +66,7 @@ test('corrupt raster produces a recoverable error', async ({page}) => {
   const manifest = await (await page.request.get('/charts/manifest.json')).json();
   test.skip(!manifest.raster, 'Import NOAA raster fixture first');
   await page.route(`**/${manifest.raster.sha256}.pmtiles`, route => route.fulfill({status:200,body:'not a PMTiles archive'}));
-  await page.goto('/#14/47.681/-122.411');
+  await page.goto('/inspect.html#14/47.681/-122.411');
   await expect(page.locator('#raster-status')).toContainText('unavailable');
   await page.getByRole('button',{name:'Inspect features',exact:true}).click();
   await expect(page.locator('#vector-panel')).toBeVisible();

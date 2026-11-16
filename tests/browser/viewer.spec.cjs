@@ -11,7 +11,7 @@ test('renders and inspects real tiles with all external requests blocked', async
     return route.continue();
   });
   page.on('response', response => {if (response.url().endsWith('.pmtiles')) ranges.push(response.status());});
-  await page.goto('/');
+  await page.goto('/inspect.html');
   await page.getByRole('button', {name: 'Inspect features', exact: true}).click();
   const manifest = await (await page.request.get('/charts/manifest.json')).json();
   await expect(page.locator('#status')).toContainText(`${manifest.sources.length} NOAA cells`);
@@ -49,7 +49,7 @@ test('detail view renders sounding labels with no external fonts or sprites', as
     }
     return route.continue();
   });
-  await page.goto('/#15/47.681/-122.411');
+  await page.goto('/inspect.html#15/47.681/-122.411');
   await page.getByRole('button', {name: 'Inspect features', exact: true}).click();
   await page.waitForFunction(() => performance.getEntriesByName('chartiles-first-idle').length > 0);
   await expect(page.locator('#zoom-hint')).toContainText('Zoom 15.0');
@@ -61,7 +61,7 @@ test('detail view renders sounding labels with no external fonts or sprites', as
 
 test('coverage audit can be toggled on the map', async ({page}) => {
   const manifest = await (await page.request.get('/charts/manifest.json')).json();
-  await page.goto('/');
+  await page.goto('/inspect.html');
   await page.getByRole('button', {name: 'Inspect features', exact: true}).click();
   await expect(page.locator('#coverage-status')).toContainText(`${manifest.sources.length} coverage footprints`);
   const button = page.getByRole('button', {name: 'Coverage', exact: true});

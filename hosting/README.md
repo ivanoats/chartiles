@@ -3,6 +3,8 @@
 Netlify serves the viewer at https://chartiles.com. The `/charts/*` redirect
 sends browsers to https://chartiles-data.ivanstorck.workers.dev, where a
 read-only Worker streams objects from the private `chartiles-charts` R2 bucket.
+The viewer resolves archive URLs on the host that served the manifest so
+PMTiles byte-range requests reach the Worker directly.
 Netlify continues to manage DNS. CORS is handled by the Worker, including for
 Netlify deploy previews. Public bucket access is not required.
 
@@ -41,8 +43,13 @@ Worker requests and R2 operations are metered under the account's plans.
 
 ## Publish the viewer
 
-Netlify builds with `npm run build` and publishes `dist`. The generated chart
-directory is gitignored and does not need to exist on the Netlify build runner.
+Netlify builds with `npm run build:site` and publishes `dist`. Netlify serves the
+homepage at `/` and the inspection map at `/inspect.html`. Preview both locally
+by running the site build followed by `npm run preview`. Run the homepage smoke
+tests against a deploy preview with
+`CHARTILES_SITE_URL=https://your-preview.example npm run test:browser -- homepage`.
+The default `npm run build` builds only the map for offline bundles. The generated
+chart directory is gitignored and does not need to exist on the Netlify build runner.
 The redirect in `netlify.toml` supplies charts independently of frontend builds.
 Local Vite development continues to use the local chart bundle.
 

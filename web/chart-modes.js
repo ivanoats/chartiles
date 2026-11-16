@@ -26,7 +26,8 @@ export function installChartModes(map, manifest, raster, rasterState, setInterac
   const featureButton = panel.querySelector('#feature-view');
   chartButton.disabled = !raster;
   chartButton.title = raster ? 'Pre-rendered NOAA imagery' : 'No raster chart installed';
-  let current = raster ? 'chart' : 'features';
+  const inspectOnOpen = new URLSearchParams(location.search).get('view') === 'features';
+  let current = raster && !inspectOnOpen ? 'chart' : 'features';
   const report = document.querySelector('#raster-status');
   const updateStatus = () => {
     if (current !== 'chart') return;

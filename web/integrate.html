@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Load the CharTiles Puget Sound archive in MapLibre and look up a chart feature's NOAA source revision.">
+  <title>Integrate Puget Sound chart data | CharTiles</title>
+  <link rel="stylesheet" href="./homepage/home.css">
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="wordmark" href="./">
+        <span class="brand-mark" aria-hidden="true"></span>CharTiles
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="./integrate.html" aria-current="page">Developers</a>
+        <a href="./inspect.html">Inspection map <span aria-hidden="true">↗</span></a>
+      </nav>
+      <details class="theme-picker">
+        <summary aria-label="Color theme" title="Color theme">
+          <span class="theme-icon" aria-hidden="true"></span>
+        </summary>
+        <fieldset>
+          <legend>Color theme</legend>
+          <label><input type="radio" name="theme-preference" value="system" checked> System</label>
+          <label><input type="radio" name="theme-preference" value="light"> Light</label>
+          <label><input type="radio" name="theme-preference" value="dark"> Dark</label>
+        </fieldset>
+      </details>
+    </div>
+  </header>
+
+  <main id="content" class="shell">
+    <article class="guide">
+      <p class="label">Developer guide</p>
+      <h1>Add Puget Sound chart features to MapLibre.</h1>
+      <p class="lede">Use the public PMTiles archive to draw wrecks, buoys, lights, and soundings. The archive is for experimental inspection. Not for navigation.</p>
+
+      <section aria-labelledby="setup">
+        <h2 id="setup">Load the archive</h2>
+        <p>Install <code>maplibre-gl</code> and <code>pmtiles</code>. In a browser module, register the PMTiles protocol before loading the vector source. This example starts with an existing MapLibre map and adds a layer once its style loads.</p>
+        <pre><code>import {addProtocol} from 'maplibre-gl';
+import {Protocol} from 'pmtiles';
+
+addProtocol('pmtiles', new Protocol().tile);
+
+async function addWrecks(map) {
+  const service = 'https://chartiles-data.ivanstorck.workers.dev/';
+  const response = await fetch(new URL('charts/manifest.json', service));
+  if (!response.ok) throw new Error('Could not load the chart manifest');
+  const manifest = await response.json();
+  const archive = new URL(manifest.pmtiles_url, service);
+
+  map.addSource('enc', {type: 'vector', url: `pmtiles://${archive.href}`});
+  map.addLayer({
+    id: 'wrecks',
+    type: 'circle',
+    source: 'enc',
+    'source-layer': 'WRECKS',
+    paint: {'circle-radius': 6, 'circle-color': '#93204c'},
+  });
+
+  map.on('click', 'wrecks', ({features: [wreck]}) =&gt; {
+    const {source_cell, feature_key} = wreck.properties;
+    const revision = manifest.sources.find(cell =&gt; cell.name === source_cell);
+    console.log(feature_key, revision);
+  });
+}
+
+// Call after creating the map and before its initial style has loaded.
+map.once('load', () =&gt; {
+  addWrecks(map).catch(console.error);
+  map.jumpTo({center: [-122.4145, 47.6766], zoom: 16});
+});</code></pre>
+      </section>
+
+      <section aria-labelledby="source">
+        <h2 id="source">Look up the NOAA source</h2>
+        <p>Click or query a rendered wreck and read its <code>source_cell</code>. Find the matching entry by <code>name</code> in the manifest’s <code>sources</code> list. It records the edition (<code>edtn</code>), update number (<code>updn</code>), and issue date (<code>isdt</code>). Keep the archive’s <code>sha256</code> with any saved feature reference.</p>
+        <div class="actions">
+          <a class="action primary" href="https://chartiles-data.ivanstorck.workers.dev/charts/manifest.json">Open the release manifest <span aria-hidden="true">↗</span></a>
+          <a class="action secondary" href="./inspect.html?view=features#18/47.6766/-122.4145">Inspect the Shilshole wreck <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <div class="footer-about">
+        <p><strong>CharTiles</strong> · MIT-licensed software.<br>Derived from NOAA Electronic Navigational Charts.</p>
+        <p>By <a href="https://ivanstorck.com">Ivan Storck</a> and
+          <a href="https://sustainablewebsites.com">Sustainable Websites</a>.
+          Built with <a href="https://verdant-design.org">Verdant</a>.</p>
+      </div>
+      <a class="footer-feedback" href="https://github.com/ivanoats/chartiles/issues">Share feedback <span aria-hidden="true">↗</span></a>
+    </div>
+  </footer>
+</body>
+</html>

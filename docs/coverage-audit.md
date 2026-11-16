@@ -15,7 +15,7 @@ python3 -m venv .venv
 .venv/bin/pip install -r pipeline/requirements-audit.txt
 .venv/bin/python pipeline/coverage.py build/puget-sound-REPLACE_WITH_BUILD_ID
 .venv/bin/python -m unittest discover -s tests/audit
-npm run build
+npm run build:site
 npm run test:browser
 ```
 

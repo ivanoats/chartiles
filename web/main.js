@@ -17,12 +17,14 @@ async function start() {
   const response = await fetch('./charts/manifest.json');
   if (!response.ok) throw new Error('No chart bundle. Run npm run charts, then npm run build.');
   const manifest = await response.json();
+  // Use the host that served the manifest so tile ranges bypass any front-end redirect.
+  const chartRoot = new URL('../', response.url);
   let raster = null;
   try { raster = rasterDescriptor(manifest); }
   catch (error) { document.querySelector('#raster-warning').textContent = `${error.message}. Vector inspection remains available.`; }
   document.querySelector('h1 small').textContent = manifest.label || manifest.region;
-  document.title = `ChartTiles · ${manifest.label || manifest.region} inspection`;
-  const url = new URL(manifest.pmtiles_url, location.href).href;
+  document.title = `CharTiles · ${manifest.label || manifest.region} inspection`;
+  const url = new URL(manifest.pmtiles_url, chartRoot).href;
   const layers = [{id: 'background', type: 'background', paint: {'background-color': '#e0e4e5'}}];
   const fills = {DEPARE: '#c0e1ed', LNDARE: '#e9dfc2'};
   const lines = {M_COVR: '#989f9e', DEPCNT: '#648d9d', COALNE: '#635e4d'};
@@ -46,7 +48,7 @@ async function start() {
   }
   const sources = {enc: {type: 'vector', url: `pmtiles://${url}`, attribution: 'NOAA ENC · experimental conversion'}};
   if (raster) {
-    sources['raster-chart'] = {type: 'raster', tiles: [`pmtiles://${new URL(raster.pmtiles_url, location.href).href}/{z}/{x}/{y}.png`], tileSize: raster.tile_size, bounds: raster.bounds, minzoom: raster.minzoom, maxzoom: raster.maxzoom, attribution: raster.attribution};
+    sources['raster-chart'] = {type: 'raster', tiles: [`pmtiles://${new URL(raster.pmtiles_url, chartRoot).href}/{z}/{x}/{y}.png`], tileSize: raster.tile_size, bounds: raster.bounds, minzoom: raster.minzoom, maxzoom: raster.maxzoom, attribution: raster.attribution};
     layers.push({id: 'raster-chart', type: 'raster', source: 'raster-chart', minzoom: raster.minzoom, paint: {'raster-fade-duration': 0}});
     for (const layer of layers) if (layer.source === 'enc') layer.layout = {...layer.layout, visibility: 'none'};
   }
