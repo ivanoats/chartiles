@@ -7,7 +7,7 @@ for (const {feature, zoom} of cases) {
   test(`inspect real ${feature.sourceLayer} at zoom ${zoom} with chart depth and raw attributes`, async ({page}) => {
     const [lng,lat] = feature.geometry.coordinates;
     const deepLink = feature.sourceLayer === 'WRECKS';
-    await page.goto(`/${deepLink ? '?view=features' : ''}#${zoom}/${lat}/${lng}`);
+    await page.goto(`/inspect.html${deepLink ? '?view=features' : ''}#${zoom}/${lat}/${lng}`);
     const inspect = page.getByRole('button', {name: 'Inspect features', exact: true});
     if (deepLink) await expect(inspect).toHaveAttribute('aria-pressed', 'true');
     else await inspect.click();

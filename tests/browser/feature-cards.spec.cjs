@@ -3,7 +3,7 @@ const fixtures = require('../fixtures/shilshole-features.json');
 for (const [index, mark, colour] of [[0,'2','R'],[1,'1','G']]) {
   test(`real Shilshole buoy ${mark} has readable light and separate depth cards`, async ({page}) => {
     const [lng,lat] = fixtures[index].geometry.coordinates;
-    await page.goto(`/#17/${lat}/${lng}`);
+    await page.goto(`/inspect.html#17/${lat}/${lng}`);
     await page.getByRole('button',{name:'Inspect features',exact:true}).click();
     const map = page.locator('#map');
     const box = await map.boundingBox();

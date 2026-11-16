@@ -1,3 +1,5 @@
+import {rename} from 'node:fs/promises';
+import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {defineConfig} from 'vite';
 import {explicitThemeVars, highContrastVars} from '@sustainablewebsites/verdant-design/theme';
@@ -35,10 +37,22 @@ function verdantHomepage() {
   };
 }
 
+function siteEntrypoints() {
+  return {
+    name: 'chartiles-site-entrypoints',
+    enforce: 'post',
+    async writeBundle({dir}) {
+      // Avoid Netlify normalizing links to the map's index.html to the homepage.
+      await rename(join(dir, 'index.html'), join(dir, 'inspect.html'));
+      await rename(join(dir, 'home.html'), join(dir, 'index.html'));
+    },
+  };
+}
+
 export default defineConfig(({mode}) => ({
   root: 'web',
   base: './',
-  plugins: [verdantHomepage()],
+  plugins: [verdantHomepage(), ...(mode === 'site' ? [siteEntrypoints()] : [])],
   build: {
     outDir: '../dist',
     emptyOutDir: true,

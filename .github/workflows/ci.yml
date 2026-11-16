@@ -43,7 +43,7 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: ./node_modules/.bin/playwright install --with-deps --only-shell chromium
-      - run: npm run build
+      - run: npm run build:site
       - name: Install chart fixtures
         run: cp -R tests/fixtures/browser-charts dist/charts
       - run: npm run test:browser -- --workers=1

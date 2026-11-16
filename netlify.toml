@@ -10,9 +10,3 @@ from = "/charts/*"
 to = "https://chartiles-data.ivanstorck.workers.dev/charts/:splat"
 status = 302
 force = true
-
-[[redirects]]
-from = "/"
-to = "/home.html"
-status = 200
-force = true
