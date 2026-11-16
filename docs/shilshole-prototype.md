@@ -4,7 +4,7 @@ This is the first executable slice of the project. It is an inspection tool, not
 
 ## Run locally
 
-Requirements: Node.js 22.12+ (or a supported newer LTS), Python 3.10+, GDAL with the S-57 driver, and Felt tippecanoe with native PMTiles support and tippecanoe-decode. The initial build used GDAL 3.13.3 and tippecanoe 2.79.0. JavaScript dependencies are locked in package-lock.json; system binaries are not yet container-pinned.
+Requirements: Node.js 24, Python 3.10+, GDAL with the S-57 driver, and Felt tippecanoe with native PMTiles support and tippecanoe-decode. The initial build used GDAL 3.13.3 and tippecanoe 2.79.0. JavaScript dependencies are locked in package-lock.json; system binaries are not yet container-pinned.
 
 ```bash
 brew install gdal tippecanoe
@@ -30,16 +30,14 @@ The chosen object classes are a subset of the ENC. Features outside the rectangl
 
 ```bash
 npm test
-npx playwright install chromium
-npm run build:site
-npm run test:browser
 ```
 
 The pipeline disables density dropping, tile feature/size caps, line simplification and tiny polygon reduction. It decodes the resulting archive at maximum zoom and fails if an extracted feature identity is missing or a sounding depth changes. Individual soundings include coordinates in their key because split soundings can share the same S-57 LNAM. Features crossing tile boundaries are counted once by identity.
 
 This check tests retention from extracted GeoJSON to maximum-zoom MVT. It does not prove faithful extraction from S-57, complete geometry retention, accuracy at every zoom, or correct nautical portrayal. Source attributes are available for manual review. GDAL can emit a SOUNDG dimensionality warning during clipping; the build independently requires every exported sounding to have a 3D coordinate and compares its copied depth with the decoded tile attribute.
 
-The browser test blocks external requests, requires a real feature to be inspectable, checks for HTTP 206 archive responses and page errors, and exercises a layer toggle. The MapLibre worker is bundled locally, along with JavaScript and CSS. No external basemap, font, or sprite service is used.
+Use the [browser fixture instructions](../tests/fixtures/README.md) to run the
+full hosted-site suite with both vector and raster data. The viewer test blocks external requests, requires a real feature to be inspectable, checks for HTTP 206 archive responses and page errors, and exercises a layer toggle. The MapLibre worker is bundled locally, along with JavaScript and CSS. No external basemap, font, or sprite service is used.
 
 Initial measured result after adding per-sounding identifiers: 472,065 archive bytes; 922 extracted features including 479 soundings, 5 wreck features and 39 rock features. Build time was about six seconds on the development machine. These numbers describe this small rectangle and source snapshot, not Puget Sound.
 
@@ -53,7 +51,10 @@ The archive is copied before the manifest is replaced. Failed builds leave the p
 
 Ivan completed the manual NOAA source checks and reported no discrepancies on September 26, 2026. The chat records completion but does not enumerate inspected features or cell-boundary checks; it is not a formal coverage audit.
 
-Next: follow the [Puget Sound expansion plan](puget-sound-expansion.md). Regional coverage checks and a comparison of two source editions remain separate work before choosing a download policy.
+The Shilshole prototype was expanded into the [Puget Sound release](puget-sound-benchmark.md).
+The [coverage audit](coverage-audit.md) measures source footprints. Review of
+feature continuity and multi-scale coverage remains in the
+[implementation plan](implementation-plan.md).
 
 References: [NOAA downloads](https://www.charts.noaa.gov/ENCs/ENCs.shtml), [GDAL S-57](https://gdal.org/en/stable/drivers/vector/s57.html), [tippecanoe](https://github.com/felt/tippecanoe), [PMTiles](https://docs.protomaps.com/pmtiles/).
 

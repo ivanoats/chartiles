@@ -40,7 +40,7 @@ ChartTiles sits at the intersection of marine hydrography, geospatial tooling, a
 
 **PMTiles.** A single-file archive format for vector or raster tiles, designed to be served via HTTP range requests directly from object storage with no tile server in front. [github.com/protomaps/PMTiles](https://github.com/protomaps/PMTiles). ChartTiles' chosen distribution format — see [ADR-0003](adr/0003-pmtiles-over-btrfs.md).
 
-**MBTiles.** Predecessor to PMTiles. A SQLite database packaging tiles. Easy to inspect, but requires a server process to convert range requests into tile fetches. ChartTiles uses it as an intermediate format only.
+**MBTiles.** A SQLite database containing tiles. A web browser typically retrieves its tiles through a tile server. CharTiles imports NOAA raster MBTiles and converts the archive to PMTiles for delivery.
 
 **Tippecanoe.** A command-line tool for building MVTs from GeoJSON. Originally Mapbox; now maintained at [github.com/felt/tippecanoe](https://github.com/felt/tippecanoe). The de facto standard. See [ADR-0006](adr/0006-tippecanoe-for-vector-tile-generation.md).
 
@@ -48,7 +48,7 @@ ChartTiles sits at the intersection of marine hydrography, geospatial tooling, a
 
 **MapLibre GL JS.** Open-source fork of Mapbox GL JS v1 (the last open-source version before Mapbox closed the source). Renders MVT in the browser via WebGL. [maplibre.org](https://maplibre.org).
 
-**Tile pyramid.** The set of tile zoom levels (0 = whole world in one tile, ~22 = millimeter resolution). Each zoom level has 4× the tiles of the previous. Marine charts care about z=4 (regional overview) through z=16 (harbor detail).
+**Tile pyramid.** The tiles at each map zoom. In a global XYZ grid, zoom zero has one tile and each next zoom has four times as many tile positions. CharTiles’ Puget Sound vector archive has native zooms 8–16. Browser zoom and source chart scale are separate.
 
 **XYZ scheme.** The Slippy Map tile addressing convention: `/{z}/{x}/{y}.pbf`. z is zoom, x and y are tile coordinates. The world coordinate system is Web Mercator (EPSG:3857).
 
@@ -56,13 +56,13 @@ ChartTiles sits at the intersection of marine hydrography, geospatial tooling, a
 
 ## Tile pipeline shorthand used in this repo
 
-- `pnw.pmtiles` — the v0.1 distribution artifact. Pacific Northwest only, single file, ~500 MB target.
-- "The pipeline" — the build process documented in [implementation-plan-history.md, Phase 1](implementation-plan-history.md).
+- `charts/<sha256>.pmtiles` identifies a published vector or raster archive by content hash.
+- "The pipeline" refers to the [current chart build and verification flow](architecture/data-flows.md#build-and-publish-chart-data).
 - "The viewer" — the web client in `web/`.
-- "The onboard rig" — the Raspberry Pi or mini-PC running locally at the nav station.
+- "The offline bundle" is the [portable inspection ZIP](offline-bundle.md) with charts and a local Python server.
 
 ## Infrastructure terms
 
-**R2.** Cloudflare's S3-compatible object storage with zero egress fees. ChartTiles' chosen hosting for PMTiles distribution.
+**R2.** Cloudflare's S3-compatible object storage. A read-only Worker serves CharTiles archives from a private R2 bucket.
 
 **Range request.** An HTTP request with a `Range:` header asking for a byte range of a file. The mechanism by which PMTiles serves individual tiles from a multi-gigabyte file without downloading the whole thing.

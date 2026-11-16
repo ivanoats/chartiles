@@ -1,5 +1,7 @@
 # Roadmap
 
+> This is the original sustainability roadmap. Use the [implementation plan](implementation-plan.md) for current status and the [business-plan review](business-plan-review.md) for the pilot assumptions. The dates and funding targets below are historical planning estimates.
+
 This is the 18-month sustainability plan. The [implementation plan](implementation-plan.md) covers what gets built; this covers how the project pays for itself.
 
 ## Thesis

@@ -1,5 +1,7 @@
 # Business Plan
 
+> This page preserves the original business assumptions. See the [business-plan review](business-plan-review.md) for assumptions that still need testing and the [implementation plan](implementation-plan.md) for the current pilot. The forecast and hosted-tier proposals are planning scenarios.
+
 This is the planning document, not a pitch deck. It exists so the maintainer (and any future collaborator or grant reviewer) can read a single file and understand what the project is trying to be, who it's for, how it pays for itself, and what failure looks like.
 
 For a tighter strategic decision, see [ADR-0002](adr/0002-open-source-infrastructure-direction.md). For timeline and milestones, see [roadmap.md](roadmap.md). For the technical plan, see [implementation-plan.md](implementation-plan.md).

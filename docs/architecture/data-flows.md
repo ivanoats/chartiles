@@ -1,132 +1,72 @@
-# Data Flows (Dynamic View)
+# Data flows
 
-Sequence diagrams for the three flows that matter end to end: the weekly build, the browser viewing path, and the onboard sync path.
-
-## Weekly build and publish
+## Build and publish chart data
 
 ```mermaid
 sequenceDiagram
-    autonumber
-    participant Cron as GH Actions cron
-    participant Pipeline as Build Pipeline
+    participant Maintainer
+    participant Pipeline
     participant NOAA
-    participant R2 as Cloudflare R2
-    participant CDN as Cloudflare CDN
-
-    Cron->>Pipeline: Trigger weekly build
-    Pipeline->>NOAA: GET cell list for PNW bounding box
-    NOAA-->>Pipeline: List of S-57 cells
-    loop For each cell
-        Pipeline->>NOAA: GET cell with MD5 check
-        NOAA-->>Pipeline: cell bytes
-    end
-    Pipeline->>Pipeline: ogr2ogr extract layers to GeoJSON
-    Pipeline->>Pipeline: Normalize attributes, filter features
-    Pipeline->>Pipeline: tippecanoe build MVT to MBTiles
-    Pipeline->>Pipeline: pmtiles convert to versioned PMTiles
-    Pipeline->>Pipeline: Compute SHA-256, write manifest
-    Pipeline->>R2: PUT versioned PMTiles
-    Pipeline->>R2: PUT manifest.json
-    Pipeline->>R2: Update latest pointer
-    Pipeline->>CDN: Purge manifest cache
-    Pipeline->>Cron: Report success or fail loudly
+    participant R2
+    Maintainer->>Pipeline: Build configured region
+    Pipeline->>NOAA: Read catalog and download selected cells
+    NOAA-->>Pipeline: Catalog and source ZIPs
+    Pipeline->>Pipeline: Extract, tile, and verify
+    Pipeline-->>Maintainer: Archive and manifest
+    Maintainer->>Pipeline: Authorize chart publication
+    Pipeline->>R2: Upload content-addressed archives and optional audit
+    Pipeline->>R2: Upload release manifest last
 ```
 
-**Cache behavior:** Versioned PMTiles are cached at the edge indefinitely because their URLs include the version. Only `manifest.json` needs an explicit purge after each build.
-
-**Cadence:** Weekly, aligned with NOAA Notice to Mariners. Configurable to daily later if NOAA's update rate justifies it.
-
-**Failure handling:** If any step fails, the run aborts and the previous successful PMTiles remains the `latest`. The maintainer is notified via GitHub Actions failure email. There is no auto-retry on data errors (failing loud is preferred to silent corruption).
-
-**Idempotency:** Two runs against the same NOAA snapshot date produce byte-identical PMTiles. This is testable in CI.
+A rebuild can also use a retained catalog and ZIP snapshot. NOAA raster
+imagery is imported separately. The publisher verifies the referenced files
+before upload. If an archive upload fails, the public manifest continues to
+refer to the previous release. The update checker reports changes for a
+retained release. A scheduled candidate-release workflow is still planned.
+See [hosting and publication](../../hosting/README.md).
 
 ## Browser viewing path
 
 ```mermaid
 sequenceDiagram
-    autonumber
-    actor Sailor
     participant Browser
-    participant CDN as Cloudflare CDN
-    participant R2 as Cloudflare R2
-
-    Sailor->>Browser: Open chartiles.com
-    Browser->>CDN: GET index.html
-    CDN-->>Browser: HTML and JS bundle
-    Browser->>CDN: GET style.json
-    CDN-->>Browser: MapLibre style JSON
-    Browser->>CDN: GET manifest.json
-    CDN-->>Browser: manifest with version, sha256, pmtiles_url
-    Browser->>Browser: Display charts last-updated date
-    Browser->>CDN: GET PMTiles header (range 0 to 16383)
-    CDN-->>Browser: First 16 KB of PMTiles
-    Browser->>Browser: Parse PMTiles directory
-    loop For each visible tile
-        Browser->>CDN: GET PMTiles range N to M
-        alt Tile cached at edge
-            CDN-->>Browser: Tile bytes - cache HIT
-        else Tile not cached
-            CDN->>R2: GET PMTiles range N to M
-            R2-->>CDN: Tile bytes
-            CDN-->>Browser: Tile bytes - cache MISS, now cached
-        end
-        Browser->>Browser: MapLibre paints tile per style
-    end
-    Sailor->>Browser: Pan, zoom, change palette
-    Browser->>Browser: Re-style without re-fetching (paint only)
+    participant Netlify
+    participant Worker
+    participant R2
+    Browser->>Netlify: Get inspection viewer
+    Netlify-->>Browser: HTML, CSS, and JavaScript
+    Browser->>Netlify: Get chart manifest
+    Netlify-->>Browser: Redirect to the chart service
+    Browser->>Worker: Get chart manifest
+    Worker->>R2: Read manifest
+    R2-->>Worker: Manifest
+    Worker-->>Browser: Manifest and archive references
+    Browser->>Worker: Request PMTiles byte range directly
+    Worker->>R2: Read selected bytes
+    Worker-->>Browser: HTTP 206 with tile or directory bytes
 ```
 
-**Latency profile:** First viewport: ~3–5 round trips for HTML + JS + style + manifest + PMTiles header, then parallel tile fetches. After cache warm-up, panning is bandwidth-bound by tile size (~10–50 KB per tile).
+The viewer resolves archive paths using the host that returned the manifest.
+This keeps byte-range requests away from the Netlify redirect.
+Raster and vector mode behavior is documented in the
+[raster chart view architecture](raster-chart-view.md).
 
-**Why no tile server:** All decoding happens in the browser. The CDN sees only HTTP `Range` requests, which it caches by URL and byte range. No server-side decoding, no per-user state.
-
-## Onboard sync path
+## Offline bundle path
 
 ```mermaid
 sequenceDiagram
-    autonumber
-    participant Cron as Local cron
-    participant Sync as Onboard Sync Daemon
-    participant CDN as Cloudflare CDN
-    participant Nginx as Onboard nginx
-    participant Browser as Nav-station Browser
-
-    Note over Cron,Browser: Every 6 hours, or on user request
-
-    Cron->>Sync: Trigger sync check
-    Sync->>CDN: GET manifest.json
-    CDN-->>Sync: manifest with version and sha256
-    Sync->>Sync: Compare with local manifest
-
-    alt No update
-        Sync->>Cron: Exit 0, no work
-    else Update available
-        Sync->>CDN: HEAD versioned PMTiles
-        CDN-->>Sync: Content-Length and ETag
-        Sync->>Sync: Check available disk space
-        Sync->>CDN: GET versioned PMTiles via aria2c, resumable, bandwidth-capped
-        CDN-->>Sync: PMTiles bytes - may span multiple resumed sessions
-        Sync->>Sync: Verify SHA-256 against manifest
-        alt SHA mismatch
-            Sync->>Sync: Discard, log failure, alert local UI
-        else SHA matches
-            Sync->>Sync: Atomic rename of new file over old
-            Sync->>Nginx: Reload via SIGHUP to drop old file handles
-        end
-    end
-
-    Note over Browser,Nginx: Independent of sync; runs whenever sailor opens viewer
-
-    Browser->>Nginx: GET PMTiles range N to M
-    Nginx-->>Browser: Tile bytes from local filesystem
+    participant Maintainer
+    participant Packager
+    participant User
+    participant Server as Local Python server
+    Maintainer->>Packager: Package map build and selected charts
+    Packager->>Packager: Verify artifact hashes and write ZIP
+    Packager-->>User: ZIP and checksum
+    User->>Server: Extract ZIP and run serve.py
+    Server-->>User: Viewer and local archive byte ranges
 ```
 
-**Bandwidth model:** A weekly full download of `pnw.pmtiles` is on the order of hundreds of MB. Over LTE at marina rates that's ~5–15 minutes; over Starlink, ~1–2 minutes; over marina wifi, variable. The bandwidth cap defaults to 1 Mbit/s so the sync doesn't starve other boat-network traffic.
-
-**Atomic swap:** The new PMTiles is downloaded as `pnw.pmtiles.new`, hashed, then `rename(2)`d over the old file. nginx is sent `SIGHUP` to force-close stale open file descriptors. The viewer never sees a partially-written file.
-
-**Offline behavior:** If `manifest.json` is unreachable, the daemon logs and exits cleanly. The local PMTiles remains in service for as long as the sailor accepts its staleness — see the freshness warning in [risks-and-safety.md](../risks-and-safety.md).
-
-## Update notification (deferred to v0.2+)
-
-A subscription mechanism — push notification, RSS feed, or a `manifest.json` polled by the onboard daemon — that lets a boat know when new charts are available. v0.1 polls on a schedule. Push-based notification is a v0.2+ enhancement, not load-bearing.
+The default package includes the active vector archive. The combined package
+adds matching raster imagery. When available, the vector coverage audit is
+bundled with its archive. The ZIP is a point-in-time release with a local
+manifest and no automatic sync. See [offline bundle instructions](../offline-bundle.md).

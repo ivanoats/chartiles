@@ -1,84 +1,87 @@
-# ChartTiles
+# CharTiles
 
-**Open-source vector chart pipeline and viewer for NOAA Electronic Navigational Charts.**
+**Open-source tools for turning NOAA Electronic Navigational Charts into
+inspectable web map tiles.**
 
-> **Safety notice — not for primary navigation.** ChartTiles is reference and planning software. Mariners are responsible for maintaining redundant, type-approved navigation systems aboard their vessels. The data here is derived from NOAA ENCs and is subject to publication delays, processing errors, and the absence of any quality-management certification. Do not use as a primary nav aid.
+> **Experimental chart inspection. Not for navigation.** CharTiles derives
+> its data from NOAA ENCs. Published builds can lag source updates, and
+> conversion can introduce errors.
 
 ## Status
 
-**Pre-v0.1 — Shilshole inspection prototype implemented.** A local pipeline downloads selected NOAA ENC cells, clips a small Shilshole Bay area, builds PMTiles, and checks feature retention at maximum zoom. A browser viewer supports local use and attribute inspection. Ivan completed the manual NOAA source checks and reported no discrepancies on September 26, 2026. Next: [Puget Sound expansion](docs/puget-sound-expansion.md).
+The public Puget Sound release covers a bounded pilot region. The viewer
+shows NOAA raster imagery or lets you inspect vector features such as lights,
+rocks, wrecks, and soundings. The project also provides an offline bundle
+builder and a runnable MapLibre example.
 
-For the larger regional benchmark, run `npm run charts:puget` followed by `npm run build`. See [Puget Sound scope and measurements](docs/puget-sound-benchmark.md).
-
-See [the prototype guide](docs/shilshole-prototype.md) for scope, validation and limitations. The broader planning documents describe future work, not completed capabilities.
+- [Open the public site](https://chartiles.com/) or [inspection map](https://chartiles.com/inspect).
+- [Integrate the Puget Sound archive](https://chartiles.com/integrate/) in a web map.
+- [Watch the CUGOS lightning talk](https://chartiles.com/cugos/) or [read the blog](https://chartiles.com/blog/).
+- [Read the implementation plan](docs/implementation-plan.md) for the inspection pilot and proposed work.
 
 ## What ChartTiles is
 
-ChartTiles compiles NOAA's Electronic Navigational Charts into modern vector tiles, packaged as a single [PMTiles](https://github.com/protomaps/PMTiles) archive per region. The same archive serves:
-
-- **A browser viewer**, via MapLibre GL JS + `pmtiles.js` reading HTTP byte ranges directly from object storage. No tile server.
-- **An offline / onboard viewer**, via a small nginx serving the PMTiles file from local disk on a Raspberry Pi or mini-PC at the nav station.
-
-The whole system is static files plus a weekly cloud build. There is no GIS database at runtime.
+The local pipeline converts selected NOAA ENC features into a vector
+[PMTiles](https://github.com/protomaps/PMTiles) archive and can import a
+separate NOAA raster archive. The public map reads chart byte ranges through
+a Cloudflare Worker backed by private R2 storage. The offline bundle serves
+the map and selected archives from a local Python server. Chart builds and
+publication are manual. GitHub Actions checks pull requests.
 
 ## Architecture in one diagram
 
-```text
-  NOAA ENC (S-57)
-        │
-        ▼   weekly build: ogr2ogr → tippecanoe → pmtiles convert
-  Single PMTiles archive (e.g. pnw.pmtiles)
-        │
-        ├──────────────► Cloudflare R2 + CDN ──► Browser (MapLibre + pmtiles.js)
-        │                          ▲
-        └──────────────────────────┴──► Onboard sync (aria2c) ──► nginx ──► Nav-station browser
+```mermaid
+flowchart LR
+    NOAA[NOAA chart data] --> Pipeline[Local build and verification]
+    Pipeline --> R2[Immutable archives and manifest in R2]
+    R2 --> Worker[Cloudflare range Worker]
+    Worker --> Browser[MapLibre browser viewer]
+    Astro[Astro and Vite site build] --> Netlify[Static Netlify site]
+    Netlify --> Browser
+    Pipeline --> Packager[Offline packager]
+    Packager --> Python[Local Python server]
+    Python --> Browser
 ```
 
-Full C4 model and sequence diagrams in [docs/architecture/](docs/architecture/).
+The [architecture reference](docs/architecture/README.md) describes the current
+system. The [ADRs](docs/adr/README.md) record why the technical choices were
+made. The [hosting runbook](hosting/README.md) covers releases and public routes.
 
 ## Repository layout
 
-```
-chartiles/
-├── README.md            # this file
-├── docs/                # all docs (start here)
-│   ├── README.md        # docs index
-│   ├── implementation-plan.md
-│   ├── business-plan.md
-│   ├── roadmap.md
-│   ├── glossary.md
-│   ├── risks-and-safety.md
-│   ├── architecture/    # C4 levels 1–3 + data flows
-│   └── adr/             # architecture decision records
-├── pipeline/            # NOAA acquisition, extraction, packaging and validation
-├── web/                 # local MapLibre inspection viewer
-└── tests/               # pipeline safeguards and browser integration
-```
+| Path | What lives there |
+| --- | --- |
+| [`src/`](src/) | Astro templates, Verdant layout, and Markdown guide and blog |
+| [`web/`](web/) | MapLibre inspection viewer and local chart artifacts |
+| [`pipeline/`](pipeline/) | Chart acquisition, extraction, validation, and publishing |
+| [`hosting/`](hosting/) | Cloudflare Worker and release instructions |
+| [`onboard/`](onboard/) | Python HTTP range server for offline packages |
+| [`talks/`](talks/) | CUGOS presentation and standalone copy |
+| [`examples/`](examples/) | Developer quickstart for the published archive |
+| [`tests/`](tests/) | Unit checks, chart fixtures, and browser tests |
 
 ## Documentation
 
-Start with [docs/README.md](docs/README.md) for the full index. Highlights:
-
-- [docs/implementation-plan.md](docs/implementation-plan.md) — current slices, status, and acceptance gates
-- [docs/business-plan.md](docs/business-plan.md) — market, customers, revenue model, KPIs
-- [docs/roadmap.md](docs/roadmap.md) — 18-month timeline with funding strategy
-- [docs/architecture/](docs/architecture/) — system context, containers, components, data flows
-- [docs/adr/](docs/adr/) — architecture decisions, including [why PMTiles instead of the Btrfs scheme this project originally proposed](docs/adr/0003-pmtiles-over-btrfs.md)
-- [docs/risks-and-safety.md](docs/risks-and-safety.md) — safety posture, technical and strategic risk registers
-- [docs/glossary.md](docs/glossary.md) — marine, GIS, and tile-format vocabulary
+Start with the [docs index](docs/README.md). For charts and coverage, see the
+[Puget Sound benchmark](docs/puget-sound-benchmark.md) and
+[coverage audit](docs/coverage-audit.md). For the next pilot, see the
+[developer quickstart](docs/developer-quickstart.md) and
+[sailor walkthrough](docs/sailor-walkthrough.md).
 
 ## Scope of v0.1
 
-- **Geographic:** Pacific Northwest only — Salish Sea, Puget Sound, San Juans, Strait of Juan de Fuca, coastal Washington to the Columbia. See [ADR-0004](docs/adr/0004-pacific-northwest-scope-for-v0-1.md).
-- **Data:** NOAA ENC. No other hydrographic offices in v0.1.
-- **Deliverable:** a single `pnw.pmtiles` archive plus a working web viewer plus an onboard configuration.
-- **Not in v0.1:** routing, AIS overlay, weather, crowdsourced soundings, native mobile SDKs.
+The current release covers the [configured Puget Sound region](docs/puget-sound-benchmark.md#scope)
+using selected NOAA harbor-scale ENCs. [ADR-0004](docs/adr/0004-pacific-northwest-scope-for-v0-1.md)
+sets the Pacific Northwest boundary for future expansion. Managed updates,
+multi-scale coverage, routing, and full S-52 portrayal remain outside the
+current release.
 
 ## Quick start
 
-Requires Node.js 22.12+, Python 3.10+, GDAL and tippecanoe. On macOS:
+Use Node.js 24 and Python 3.10 or later. To build the Shilshole chart fixture
+on macOS, install GDAL and tippecanoe first.
 
-```bash
+```sh
 brew install gdal tippecanoe
 npm ci
 npm run charts
@@ -86,22 +89,23 @@ npm run build
 npm run preview
 ```
 
-Open the local URL printed by Vite. The built viewer works with internet disconnected while the local server stays running. Click features to inspect their attributes. This is a basic inspection style, not a navigational portrayal.
+Open the local URL printed by Vite. Use `npm run charts:puget` for the regional
+archive. See the [Shilshole guide](docs/shilshole-prototype.md) for data
+provenance and [offline packaging](docs/offline-bundle.md) for a portable ZIP.
 
-See [docs/shilshole-prototype.md](docs/shilshole-prototype.md) for tests and data provenance.
+To preview the complete site, use `npm run build:site` followed by
+`npm run preview`. To run the browser suite, use the site build and install
+the [browser fixtures](tests/fixtures/README.md) if you haven’t built charts.
+[Site and blog workflow](hosting/README.md#publish-the-viewer)
 
 ## Contributing
 
-Contribution guidelines will be added before v0.1. In the meantime:
-
-- Read the [ADRs](docs/adr/) before proposing architectural changes.
-- File issues for missing edge cases in the docs, unclear safety language, or factual errors about the maritime / GIS domain.
-- PRs against `docs/` are welcome now.
+Read the [ADRs](docs/adr/README.md) before proposing architecture changes.
+Report unclear inspection behavior, coverage examples, or documentation gaps
+in [GitHub Issues](https://github.com/ivanoats/chartiles/issues).
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
-NOAA chart data is in the public domain. We attribute NOAA in the viewer chrome and in PMTiles metadata as a matter of credit and provenance even though no attribution is legally required.
-
-The license rationale, including why MIT over Apache 2.0 and the relationship to the safety disclaimer, is in [ADR-0008](docs/adr/0008-mit-license-with-not-for-navigation-disclaimer.md).
+The software is [MIT licensed](LICENSE). The viewer and archives credit NOAA
+for the source data. See [ADR-0008](docs/adr/0008-mit-license-with-not-for-navigation-disclaimer.md)
+for the project's licensing and safety decisions.

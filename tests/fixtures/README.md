@@ -8,18 +8,18 @@ Shilshole Bay, a manifest, and a coverage audit. The vector tiles come from the
 from the [NOAA NCDS import](../../docs/raster-chart-view.md). Both archives are
 content-addressed and together take about 1.4 MiB. The bundle is for tests only.
 
-A clean checkout can run the same tests as CI with these commands:
+With Node.js 24, a clean checkout can run the same tests as CI with these commands:
 
 ```sh
 npm ci --ignore-scripts
 ./node_modules/.bin/playwright install chromium
-npm run build
+npm run build:site
 cp -R tests/fixtures/browser-charts dist/charts
 npm run test:browser -- --workers=1
 ```
 
 If `web/public/charts` already contains a local bundle, use a clean checkout for
-the fixture run. `npm run build` copies that local bundle into `dist/charts`.
+the fixture run. `npm run build:site` copies that local bundle into `dist/charts`.
 
 The extracts retain the original tile payloads through native zoom 16. The
 vector bounds are `-122.473,47.649,-122.398,47.689` with `--minzoom=11`.

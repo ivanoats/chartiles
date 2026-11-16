@@ -4,21 +4,21 @@ This document captures the risks the project is willingly running into and the s
 
 ## Safety posture
 
-> **ChartTiles is not for primary navigation. It is reference and planning software. Mariners are responsible for maintaining redundant, type-approved navigation systems aboard their vessels.**
+> **CharTiles is for experimental chart inspection. Not for navigation.**
 
 That sentence (or a close variant) must appear in:
 
 - The repository `README.md`.
 - The project website landing page.
 - The web viewer's chrome (a persistent footer or banner).
-- The onboard sync script's first-run output.
+- The offline viewer and bundled README.
 - Tile metadata where the format supports it.
 
 This is a deliberate, repeated, non-negotiable disclaimer. The rationale lives in [ADR-0008](adr/0008-mit-license-with-not-for-navigation-disclaimer.md).
 
 ### Why this matters
 
-NOAA's own ENC license terms require derivative works to carry equivalent disclaimers. Beyond the legal requirement, the practical reason is that ChartTiles:
+The disclaimer reflects the project’s limitations. CharTiles:
 
 - Has no type approval (IMO / SOLAS / Coast Guard).
 - Has no formal Quality Management System.
@@ -33,8 +33,8 @@ A boat running aground because ChartTiles was used as primary nav is a real fail
 | --- | --- | --- | --- |
 | User treats ChartTiles as primary nav, runs aground, sues | Low | High | Repeated disclaimer; MIT license disclaims warranty; no marketing language that implies certified use |
 | NOAA upstream changes ENC license or format | Low | Medium | Pin format version; monitor NOAA Office of Coast Survey announcements; S-100 migration is the watch item |
-| Stale data: chart in production is missing a recent Notice to Mariners | Medium | Medium | Weekly pipeline build; sync script shows a clear "last updated" date in the viewer; refuse to display if older than 90 days unless user overrides |
-| Maintainer becomes unavailable for >30 days | Medium | Medium | Build pipeline runs unattended via GitHub Actions; key bus-factor decisions documented in ADRs; sponsor list + Open Collective gives a continuity path |
+| Stale data: chart in production is missing a recent Notice to Mariners | Medium | Medium | Show the build date and source revisions. The catalog checker can report source changes. Scheduled managed updates remain planned. |
+| Maintainer becomes unavailable for >30 days | Medium | Medium | Record build and release steps in the runbook. PR tests run in GitHub Actions and chart publication is manual. |
 
 We deliberately do **not** carry commercial maritime liability insurance at this stage. If the project takes on paying enterprise customers, this changes — see [ADR-0008](adr/0008-mit-license-with-not-for-navigation-disclaimer.md).
 
@@ -43,11 +43,11 @@ We deliberately do **not** carry commercial maritime liability insurance at this
 | Risk | Likelihood | Impact | Mitigation |
 | --- | --- | --- | --- |
 | `pnw.pmtiles` exceeds 500 MB target, blowing the sync budget for boats on satellite | Medium | Medium | Aggressive zoom-level pruning; layer-by-layer size budgeting in CI; regional PMTiles splits if needed in v0.2 |
-| Tippecanoe drops sounding labels at high zoom due to density | High | Medium | Use `--no-tile-stats` and per-layer minzoom tuning; CI check for `SOUNDG` feature count at z=14+ |
-| MapLibre can't natively express some S-52 symbology (e.g. complex lateral mark shapes with topmarks) | High | Low | Use sprite sheets with pre-rendered symbols; document gaps in the style README; full S-52 fidelity is explicitly out of scope for v0.1 |
-| Browser memory pressure on long passages (panning across hundreds of tiles) | Medium | Low | Use MapLibre's tile cache eviction defaults; document tested browsers in `web/README.md` |
-| PMTiles `Range` requests not supported by some marina wifi captive portals / proxies | Low | Medium | Document required HTTP behavior; provide a `.tar.gz` fallback download for the onboard rig |
-| NOAA's bulk download endpoint changes URL or schema | Low | Low | Pin endpoint in pipeline config; mirror to R2 weekly as a backup |
+| Tippecanoe drops sounding labels at high zoom due to density | High | Medium | Verify sounding identity and depth at maximum archive zoom. Chromium tests check initial labels on a real feature at multiple display zooms. |
+| MapLibre can't natively express some S-52 symbology (e.g. complex lateral mark shapes with topmarks) | High | Low | Use simplified symbols in inspection and upstream imagery in Chart view. Full S-52 portrayal remains outside the current scope. |
+| Browser memory pressure on long passages (panning across hundreds of tiles) | Medium | Low | Use MapLibre tile caching. Chromium CI tests fixture-scale use. Long sessions on onboard hardware remain unmeasured. |
+| PMTiles `Range` requests not supported by some marina wifi captive portals / proxies | Low | Medium | Verify Worker byte-range responses and prepare an offline ZIP before disconnecting. |
+| NOAA's bulk download endpoint changes URL or schema | Low | Low | Use the pipeline’s known source endpoint and retain input snapshots for reproduction. |
 
 ## Strategic risk register
 
@@ -63,7 +63,7 @@ These are the risks to the project's existence as an open-source infrastructure 
 
 ## What we don't worry about (and why)
 
-- **Performance at scale.** The hosted tier's COGS scales with R2 storage + CDN egress, both cheap and well-understood. The open-source pipeline runs on a free-tier GitHub runner.
+- **Performance at scale.** Hosted operations currently use static site delivery and metered Worker and R2 requests. See the [business-plan review](business-plan-review.md) for cost assumptions that need measurement.
 - **Vendor lock-in to Cloudflare.** R2 is S3-compatible; the upload step can target any S3 endpoint. PMTiles is filesystem-agnostic.
 - **Format obsolescence.** MVT is the de facto open standard. PMTiles is gaining ecosystem traction (Protomaps, Stamen, OpenStreetMap planet builds). If either disappears, we have a year+ to migrate.
 - **Internationalization of the data.** US-only is a deliberate v0.1 choice ([ADR-0004](adr/0004-pacific-northwest-scope-for-v0-1.md)). Adding other hydrographic offices is a v2.0 decision.
