@@ -2,7 +2,7 @@
 title: The coastline that disappeared
 description: A short line near Shilshole survived in NOAA’s source chart but vanished in our web tiles. A build check found it.
 date: 2026-11-16
-draft: true
+draft: false
 ---
 
 A short piece of coastline near Shilshole made it into the input for our Puget Sound map. It didn’t make it out. The first regional build failed because it couldn’t find the line’s ID in the finished tiles.

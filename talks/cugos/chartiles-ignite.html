@@ -104,6 +104,12 @@ dt{font-weight:750;font-size:3.8cqw;letter-spacing:-.05em}dd,.sample{font-size:1
 .validation-record p:first-child{padding-bottom:.45cqw;border-bottom:1px solid var(--line)}
 .validation-record code,.validation-record p:last-child strong{color:#234f38;font-size:1.9cqw}
 .validation-limits{font-size:2.15cqw}
+.pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1cqw;margin:0;padding:0;list-style:none;counter-reset:stage}
+.pipeline li{display:grid;align-content:start;gap:.6cqw;min-height:13cqw;padding:1.1cqw;border:1px solid #7f735b;border-radius:.75cqw;background:#fff;font-size:1.5cqw;line-height:1.3;counter-increment:stage}
+.pipeline li strong{font-size:2.15cqw;letter-spacing:-.02em}
+.pipeline li strong::before{content:counter(stage) ". ";color:var(--green)}
+.pipeline li span{color:#234f38}
+.pipeline-note{font-size:2.15cqw}
 .depth-comparison{display:grid;grid-template-columns:1fr 1fr;gap:1.4cqw}
 .depth-record{display:grid;align-content:start;gap:.7cqw;padding:1.4cqw;border:1px solid var(--line);border-radius:.65cqw;background:var(--sea);font-size:1.85cqw}
 .depth-record p:first-child{padding-bottom:.5cqw;border-bottom:1px solid var(--line)}
@@ -343,12 +349,24 @@ body:not(.ready) .notes{grid-column:1/-1;padding-bottom:1rem;background:var(--pa
 <p class="notes">At harbor scale, this example uses the harbor chart. On the left, there’s one diamond where the buoy belongs. On the right, the detail panel tells me which chart supplied it. That gives us three things to test: one symbol, right place, right source.</p>
 </section>
 <section class="slide">
-<p class="label">An invitation to CUGOS</p><h2>Bring one tricky chart boundary.</h2><p class="sub">A harbor entrance, a shared aid, or a feature that changes across scales.</p>
-<p class="notes">This slide is my ask for CUGOS. Bring two NOAA chart IDs, one location where they meet or overlap, and a feature you’d expect the map to show there. We can turn your example into a test we rerun on every build.</p>
+<p class="label">The whole pipeline</p><h2>Every stage has a check.</h2>
+<figure class="grid-figure" aria-label="Five pipeline stages: ingest NOAA chart files, extract features, tile into PMTiles, audit coverage, and publish with a release pointer. Each stage lists the check that runs there.">
+  <ol class="pipeline">
+    <li><strong>Ingest</strong>99 NOAA chart files<span>Check: every feature keeps its source chart</span></li>
+    <li><strong>Extract</strong>Features and attributes<span>Check: unrecorded stays unrecorded</span></li>
+    <li><strong>Tile</strong>One 54 MiB PMTiles file<span>Check: IDs and depths read back</span></li>
+    <li><strong>Audit</strong>Chart coverage<span>Check: no footprint overlaps</span></li>
+    <li><strong>Publish</strong>Static hosting<span>Check: the pointer switches last</span></li>
+  </ol>
+  <figcaption>The stages from this talk, in order.</figcaption>
+</figure>
+<p class="pipeline-note"><strong>Built with AI coding agents.</strong> The checks decide what ships.</p>
+<p class="notes">That’s the whole pipeline: ingest NOAA’s charts, extract the features, tile them into one PMTiles file, audit the coverage, and publish. I built it with AI coding agents. The check at each stage is what makes that safe.</p>
 </section>
 <section class="slide inverse">
-<p class="label">Ivan Storck · CharTiles</p><h2>Add a chart feature. Keep its source in reach.</h2><p class="sub"><a href="https://chartiles.com/">chartiles.com</a> · <a href="https://github.com/ivanoats/chartiles">Source and build notes</a><br>Experimental chart inspection. Not for navigation.</p>
-<p class="notes">The link on screen takes you back to CharTiles. Try clicking the Shilshole wreck. The thing I wanted as a sailor is the thing I want other map builders to reuse: click a mark and see what the chart actually says.</p>
+<p class="label">Ivan Storck · CharTiles</p><h2>I build AI-assisted data pipelines for maps, charts, and media, with a check at every stage.</h2>
+<p class="sub">Email me one map, chart, or dataset that’s stuck.<br><a href="mailto:ivan@ivanstorck.com">ivan@ivanstorck.com</a> · <a href="https://www.ivanstorck.com/work-with-me/">ivanstorck.com/work-with-me</a></p>
+<p class="notes">That’s the work I do now: data pipelines for maps, charts, and media, built with AI agents and checked at every stage. If you have a map, chart, or dataset that’s stuck, email me and tell me what you want it to do.</p>
 </section>
 </main>
 <nav class="controls" aria-label="Presentation controls">
