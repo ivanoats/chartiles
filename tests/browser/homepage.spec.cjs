@@ -21,3 +21,30 @@ test('homepage opens Shilshole and lets visitors inspect the wreck', async ({pag
     await expect(page.locator('[data-kind="WRECKS"]')).toContainText('Depth not recorded', {timeout: 1000});
   }).toPass({timeout: 8000});
 });
+
+test('theme choice persists across pages and System follows the browser', async ({page}) => {
+  await page.emulateMedia({colorScheme: 'light'});
+  await page.goto('/');
+  const theme = page.locator('summary[aria-label="Color theme"]');
+  const body = page.locator('body');
+  const light = 'rgb(250, 248, 243)';
+  const dark = 'rgb(21, 20, 15)';
+
+  await expect(body).toHaveCSS('background-color', light);
+  await theme.click();
+  await expect(page.getByRole('radio', {name: 'System'})).toBeChecked();
+  await page.getByRole('radio', {name: 'Dark'}).check();
+  await expect(body).toHaveCSS('background-color', dark);
+
+  await page.getByRole('navigation').getByRole('link', {name: 'Developers'}).click();
+  await expect(body).toHaveCSS('background-color', dark);
+  await page.emulateMedia({colorScheme: 'dark'});
+  await theme.click();
+  await expect(page.getByRole('radio', {name: 'Dark'})).toBeChecked();
+  await page.getByRole('radio', {name: 'Light'}).check();
+  await expect(body).toHaveCSS('background-color', light);
+  await page.getByRole('radio', {name: 'System'}).check();
+  await expect(body).toHaveCSS('background-color', dark);
+  await page.emulateMedia({colorScheme: 'light'});
+  await expect(body).toHaveCSS('background-color', light);
+});

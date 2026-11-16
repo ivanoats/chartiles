@@ -1,8 +1,9 @@
+import {readFileSync} from 'node:fs';
 import {rename} from 'node:fs/promises';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {defineConfig} from 'vite';
-import {explicitThemeVars, highContrastVars} from '@sustainablewebsites/verdant-design/theme';
+import {explicitThemeVars, highContrastVars, themeOverrideAttr} from '@sustainablewebsites/verdant-design/theme';
 import {fontFamilyTokens, fontSizeTokens, radiiTokens, spacingTokens} from '@sustainablewebsites/verdant-design/tokens';
 
 function declarations(tokens, prefix = '') {
@@ -20,18 +21,27 @@ function verdantHomepage() {
     declarations(radiiTokens, '--radius-'),
     declarations(spacingTokens, '--space-'),
   ].join(';');
+  const systemTheme = `:root:not([${themeOverrideAttr}])`;
+  const light = `:root[${themeOverrideAttr}="light"]`;
+  const dark = `:root[${themeOverrideAttr}="dark"]`;
   const css = [
     `:root{color-scheme:light dark;${base}}`,
-    `@media(prefers-color-scheme:dark){:root{${declarations(explicitThemeVars.dark)}}}`,
-    `@media(prefers-contrast:more){:root{${declarations(highContrastVars.light)}}}`,
-    `@media(prefers-color-scheme:dark) and (prefers-contrast:more){:root{${declarations(highContrastVars.dark)}}}`,
+    `@media(prefers-color-scheme:dark){${systemTheme}{${declarations(explicitThemeVars.dark)}}}`,
+    `${light}{color-scheme:light}`,
+    `${dark}{color-scheme:dark;${declarations(explicitThemeVars.dark)}}`,
+    `@media(prefers-contrast:more){${systemTheme},${light}{${declarations(highContrastVars.light)}}${dark}{${declarations(highContrastVars.dark)}}}`,
+    `@media(prefers-color-scheme:dark) and (prefers-contrast:more){${systemTheme}{${declarations(highContrastVars.dark)}}}`,
   ].join('');
+  const runtime = readFileSync(new URL(import.meta.resolve('@sustainablewebsites/verdant-design/theme-toggle.js')), 'utf8');
 
   return {
     name: 'verdant-homepage',
     transformIndexHtml(_html, {filename}) {
       if (['home.html', 'integrate.html'].some(file => filename.endsWith(`/${file}`))) {
-        return [{tag: 'style', children: css, injectTo: 'head'}];
+        return [
+          {tag: 'script', children: runtime, injectTo: 'head'},
+          {tag: 'style', children: css, injectTo: 'head'},
+        ];
       }
     },
   };
