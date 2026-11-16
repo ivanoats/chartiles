@@ -41,7 +41,10 @@ Worker requests and R2 operations are metered under the account's plans.
 
 ## Publish the viewer
 
-Netlify builds with `npm run build` and publishes `dist`. The generated chart
+Netlify builds with `npm run build:site` and publishes `dist`. Netlify serves the
+homepage at `/` and the inspection map at `/index.html`. Preview both locally by
+running the site build followed by `npm run preview`, then open `/home.html` or
+`/index.html`. The default `npm run build` builds only the map for offline bundles. The generated chart
 directory is gitignored and does not need to exist on the Netlify build runner.
 The redirect in `netlify.toml` supplies charts independently of frontend builds.
 Local Vite development continues to use the local chart bundle.

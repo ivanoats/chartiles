@@ -1,5 +1,5 @@
 [build]
-command = "npm run build"
+command = "npm run build:site"
 publish = "dist"
 
 [build.environment]
@@ -9,4 +9,10 @@ NODE_VERSION = "22"
 from = "/charts/*"
 to = "https://chartiles-data.ivanstorck.workers.dev/charts/:splat"
 status = 302
+force = true
+
+[[redirects]]
+from = "/"
+to = "/home.html"
+status = 200
 force = true
