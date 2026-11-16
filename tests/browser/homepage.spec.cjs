@@ -49,15 +49,20 @@ test('theme choice persists across pages and System follows the browser', async 
   await expect(body).toHaveCSS('background-color', light);
 });
 
-test('blog lists the Markdown draft and opens it for review', async ({page}) => {
+test('blog shows the first article’s teaser and links to the published post', async ({page}) => {
   await page.goto('/');
   await page.getByRole('navigation').getByRole('link', {name: 'Blog'}).click();
   await expect(page.getByRole('heading', {name: 'CharTiles blog'})).toBeVisible();
-  await page.getByRole('link', {name: 'The coastline that disappeared'}).click();
+  await expect(page.locator('footer a[href="/cugos/"]')).toHaveCount(0);
+  const preview = page.getByRole('listitem').filter({hasText: 'The coastline that disappeared'});
+  await expect(preview).toContainText('A short line near Shilshole survived in NOAA’s source chart but vanished in our web tiles.');
+  await preview.getByRole('link', {name: 'The coastline that disappeared'}).click();
   await expect(page.getByRole('heading', {name: 'The coastline that disappeared'})).toBeVisible();
   await expect(page.getByRole('heading', {name: 'Two ends, one grid point'})).toBeVisible();
   const diagram = page.getByRole('img', {name: /coastline endpoints collapse/});
   await diagram.scrollIntoViewIfNeeded();
   await expect.poll(() => diagram.evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+  await expect(page.locator('meta[name="robots"][content="noindex"]')).toHaveCount(0);
+  await page.getByRole('article').getByRole('link', {name: 'CUGOS talk with the tile-grid diagrams'}).click();
+  await expect(page.getByRole('heading', {name: 'Why CharTiles?'})).toBeVisible();
 });

@@ -20,7 +20,7 @@ disagrees with this file, this file wins.
 | Slice 1 — Shared attributes and hazard inspection | Done, merged 2026-09-29 | [PR #4](https://github.com/ivanoats/chartiles/pull/4) |
 | Slice 1.1 — Sounding labels on initial view | Done, merged 2026-11-14 | [PR #9](https://github.com/ivanoats/chartiles/pull/9) |
 | Slice 1.2 — Continuous integration and license | Done, merged 2026-11-14 | [PR #10](https://github.com/ivanoats/chartiles/pull/10) |
-| Public site and Markdown blog | Astro site deployed. First post is a draft. | [PR #14](https://github.com/ivanoats/chartiles/pull/14) |
+| Public site and Markdown blog | Astro site deployed. First post is ready for the public blog. | [PR #14](https://github.com/ivanoats/chartiles/pull/14) |
 | CUGOS talk and pilot materials | Deck and guides merged. Sessions and interview outcomes remain to be recorded. | [PR #12](https://github.com/ivanoats/chartiles/pull/12), [PR #13](https://github.com/ivanoats/chartiles/pull/13) |
 | Business review | Overdue, was due 2026-10-29 | [Evidence log](#evidence-log) |
 | Slice 2 — Build-time aid associations | Not started | — |
