@@ -1,5 +1,5 @@
 import {readFileSync} from 'node:fs';
-import {rename} from 'node:fs/promises';
+import {copyFile, cp, mkdir, rename} from 'node:fs/promises';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {defineConfig} from 'vite';
@@ -55,6 +55,14 @@ function siteEntrypoints() {
       // Avoid Netlify normalizing links to the map's index.html to the homepage.
       await rename(join(dir, 'index.html'), join(dir, 'inspect.html'));
       await rename(join(dir, 'home.html'), join(dir, 'index.html'));
+
+      const talkSource = fileURLToPath(new URL('./talks/cugos/', import.meta.url));
+      const talkOutput = join(dir, 'cugos');
+      await mkdir(talkOutput, {recursive: true});
+      await Promise.all([
+        copyFile(join(talkSource, 'index.html'), join(talkOutput, 'index.html')),
+        cp(join(talkSource, 'assets'), join(talkOutput, 'assets'), {recursive: true}),
+      ]);
     },
   };
 }
