@@ -1,0 +1,13 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import Guide, {frontmatter} from '../content/developer-guide.md';
+---
+<SiteLayout title="Integrate Puget Sound chart data" description={frontmatter.description}>
+  <article class="guide">
+    <p class="label">Developer guide</p>
+    <h1>{frontmatter.title}</h1>
+    <div class="prose">
+      <Guide />
+    </div>
+  </article>
+</SiteLayout>

@@ -1,0 +1,20 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import {formatDate, getPosts, showDrafts} from '../../components/blog.mjs';
+const posts = (await getPosts()).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+<SiteLayout title="Blog" description="Notes on building CharTiles and working with nautical chart data." noindex={showDrafts}>
+  <section class="guide">
+    <h1>CharTiles blog</h1>
+    <p class="lede">Notes on building CharTiles and working with nautical chart data.</p>
+    {posts.length ? <ul class="post-list">
+      {posts.map(({id, data}) => (
+        <li class="card">
+          <p class="post-meta"><time datetime={data.date.toISOString().slice(0, 10)}>{formatDate(data.date)}</time>{data.draft && ' · Draft'}</p>
+          <h2><a href={`/blog/${id}/`}>{data.title}</a></h2>
+          <p>{data.description}</p>
+        </li>
+      ))}
+    </ul> : <p>No posts yet.</p>}
+  </section>
+</SiteLayout>

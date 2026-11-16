@@ -1,52 +1,26 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Add inspectable NOAA chart features to your marine web app. Explore the experimental Puget Sound map or use the open PMTiles archive with MapLibre.">
-  <title>CharTiles | Open chart data for marine apps</title>
-  <link rel="stylesheet" href="./homepage/home.css">
-</head>
-<body>
-  <a class="skip-link" href="#content">Skip to content</a>
-  <header class="site-header">
-    <div class="shell header-inner">
-      <a class="wordmark" href="./" aria-current="page">
-        <span class="brand-mark" aria-hidden="true"></span>CharTiles
-      </a>
-      <nav aria-label="Main navigation">
-        <a href="./integrate.html">Developers</a>
-        <a href="./inspect.html">Inspection map <span aria-hidden="true">↗</span></a>
-      </nav>
-      <details class="theme-picker">
-        <summary aria-label="Color theme" title="Color theme">
-          <span class="theme-icon" aria-hidden="true"></span>
-        </summary>
-        <fieldset>
-          <legend>Color theme</legend>
-          <label><input type="radio" name="theme-preference" value="system" checked> System</label>
-          <label><input type="radio" name="theme-preference" value="light"> Light</label>
-          <label><input type="radio" name="theme-preference" value="dark"> Dark</label>
-        </fieldset>
-      </details>
-    </div>
-  </header>
-
-  <main id="content" class="shell">
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import hero from '../assets/shilshole.webp';
+import smallHero from '../assets/shilshole-small.webp';
+---
+<SiteLayout
+  title="Open chart data for marine apps"
+  description="Add inspectable NOAA chart features to your marine web app. Explore Puget Sound or use the open PMTiles archive with MapLibre."
+>
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="label"><span class="status-dot" aria-hidden="true"></span> Puget Sound preview</p>
         <h1 id="hero-title">Open chart data for marine apps.</h1>
         <p class="lede">Add inspectable NOAA chart features to your map with a single PMTiles archive. Load it in MapLibre without running your own chart conversion pipeline or tile server.</p>
         <div class="actions">
-          <a class="action primary" href="./inspect.html">Open the inspection map <span aria-hidden="true">↗</span></a>
-          <a class="action secondary" href="./integrate.html">Use the data</a>
+          <a class="action primary" href="/inspect.html">Open the inspection map <span aria-hidden="true">↗</span></a>
+          <a class="action secondary" href="/integrate/">Use the data</a>
         </div>
         <p class="notice">Experimental chart data. Not for navigation.</p>
       </div>
       <figure class="chart">
-        <img src="./homepage/shilshole.webp"
-             srcset="./homepage/shilshole-small.webp 420w, ./homepage/shilshole.webp 755w"
+        <img src={hero.src}
+             srcset={`${smallHero.src} 420w, ${hero.src} 755w`}
              sizes="(min-width: 70rem) 32rem, (min-width: 55rem) 46vw, 94vw"
              width="755" height="610" fetchpriority="high"
              alt="CharTiles map centered on the two Shilshole Bay entrance buoys, with nearby depth soundings and contours.">
@@ -63,12 +37,12 @@
         <article class="card">
           <h3>Put chart features in your app</h3>
           <p>Use the public archive to put buoys, lights, wrecks, and soundings on a MapLibre map. Serve the same file from your own storage when you need to.</p>
-          <a href="./integrate.html">See how to integrate <span aria-hidden="true">→</span></a>
+          <a href="/integrate/">See how to integrate <span aria-hidden="true">→</span></a>
         </article>
         <article class="card">
           <h3>See what the chart recorded</h3>
           <p>Select a feature and read its recorded attributes, including depth and sounding quality where present. Trace it back to the NOAA source cell.</p>
-          <a href="./inspect.html?view=features#18/47.6766/-122.4145">Explore near Shilshole <span aria-hidden="true">↗</span></a>
+          <a href="/inspect.html?view=features#18/47.6766/-122.4145">Explore near Shilshole <span aria-hidden="true">↗</span></a>
         </article>
         <article class="card">
           <h3>Review charts offline</h3>
@@ -85,7 +59,7 @@
         <p>Read the release manifest for the archive URL, build date, and NOAA cell revisions. Then use the PMTiles protocol to add the vector source in MapLibre.</p>
         <div class="actions">
           <a class="action primary" href="https://chartiles-data.ivanstorck.workers.dev/charts/manifest.json">Open the release manifest <span aria-hidden="true">↗</span></a>
-          <a class="action secondary" href="./integrate.html">Read the integration guide <span aria-hidden="true">↗</span></a>
+          <a class="action secondary" href="/integrate/">Read the integration guide <span aria-hidden="true">↗</span></a>
         </div>
       </div>
       <ol class="integration-steps">
@@ -94,18 +68,4 @@
         <li><strong>Inspect a feature.</strong> Draw a layer such as <code>WRECKS</code> and use its <code>source_cell</code> to look up the NOAA revision.</li>
       </ol>
     </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="shell footer-inner">
-      <div class="footer-about">
-        <p><strong>CharTiles</strong> · MIT-licensed software.<br>Derived from NOAA Electronic Navigational Charts.</p>
-        <p>By <a href="https://ivanstorck.com">Ivan Storck</a> and
-          <a href="https://sustainablewebsites.com">Sustainable Websites</a>.
-          Built with <a href="https://verdant-design.org">Verdant</a>.</p>
-      </div>
-      <a class="footer-feedback" href="https://github.com/ivanoats/chartiles/issues">Share feedback <span aria-hidden="true">↗</span></a>
-    </div>
-  </footer>
-</body>
-</html>
+</SiteLayout>

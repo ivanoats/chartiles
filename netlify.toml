@@ -3,10 +3,15 @@ command = "npm run build:site"
 publish = "dist"
 
 [build.environment]
-NODE_VERSION = "22"
+NODE_VERSION = "24"
 
 [[redirects]]
 from = "/charts/*"
 to = "https://chartiles-data.ivanstorck.workers.dev/charts/:splat"
 status = 302
 force = true
+
+[[redirects]]
+from = "/integrate.html"
+to = "/integrate/"
+status = 301

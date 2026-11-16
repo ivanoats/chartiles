@@ -48,3 +48,16 @@ test('theme choice persists across pages and System follows the browser', async 
   await page.emulateMedia({colorScheme: 'light'});
   await expect(body).toHaveCSS('background-color', light);
 });
+
+test('blog lists the Markdown draft and opens it for review', async ({page}) => {
+  await page.goto('/');
+  await page.getByRole('navigation').getByRole('link', {name: 'Blog'}).click();
+  await expect(page.getByRole('heading', {name: 'CharTiles blog'})).toBeVisible();
+  await page.getByRole('link', {name: 'The coastline that disappeared'}).click();
+  await expect(page.getByRole('heading', {name: 'The coastline that disappeared'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Two ends, one grid point'})).toBeVisible();
+  const diagram = page.getByRole('img', {name: /coastline endpoints collapse/});
+  await diagram.scrollIntoViewIfNeeded();
+  await expect.poll(() => diagram.evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+});
