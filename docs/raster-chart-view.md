@@ -1,6 +1,6 @@
 # Raster chart view
 
-The viewer now offers **Chart view** (pre-rendered NOAA imagery) and
+The [hosted Puget Sound viewer](https://chartiles.com/inspect) offers **Chart view** (pre-rendered NOAA imagery) and
 **Inspect features** (our extracted ENC vectors). Controls live in the map.
 Switching retains the camera and clears the previous selection. Chart view
 supports pan/zoom; feature identification and vector coverage are available only
@@ -117,14 +117,14 @@ production deployment was performed during local implementation.
 `npm test` covers artifact/header validation, upload failure ordering, package
 selection/checksums and existing pipeline/server behavior. `npm run test:browser`
 checks both modes, camera retention, external-network blocking, missing/corrupt
-raster recovery, overzoom/outside-bounds messages and legacy manifests. Raster
-browser cases require the imported local archive; they explicitly skip without it.
+raster recovery, overzoom/outside-bounds messages and legacy manifests. PR CI supplies both raster and vector [fixtures](../tests/fixtures/README.md).
+Local runs need the raster fixture or an imported raster archive for raster cases.
 
 Source dates and rendering limitations remain visible. The imagery uses the
 units printed by its source portrayal; the vector inspector's metre labels must
 not be applied to raster soundings.
 
-Local validation: 19 Python tests, one Worker test and seven browser tests pass.
+During the original local validation, 19 Python tests, one Worker test, and seven browser tests passed.
 The combined ZIP was extracted, every SHA256SUMS entry verified, and both modes
 loaded from its bundled Python server with external requests blocked. Raster
 rendering and vector feature selection worked with HTTP 206 responses and no

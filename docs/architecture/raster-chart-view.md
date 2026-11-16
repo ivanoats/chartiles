@@ -1,6 +1,7 @@
 # Raster chart view architecture
 
-Status: implemented locally under ADR 0009; production publication remains.
+Chart view and vector inspection are available in the hosted Puget Sound viewer
+and in combined offline packages.
 See [run instructions and measurements](../raster-chart-view.md).
 
 ## Context and containers
@@ -25,31 +26,25 @@ flowchart LR
     User[User] --> Browser
 ```
 
-This is a container-level view of existing and planned responsibilities.
-The raster importer is new; the publisher and packager support both artifacts.
+The [raster importer](../../pipeline/import_raster.py), publisher, and packager
+handle the two archives independently.
 
 ## Browser components
 
-The manifest adapter validates and normalizes old vector-only manifests and the
-new versioned format. A mode controller selects Chart view or Inspect features,
-preserves the camera and controls tools. MapLibre adapters create a raster source
-or the existing vector layers. A source-status panel presents active provenance,
-attribution, errors and scale limits. These are logical responsibilities; exact
-module names should follow implementation needs.
-
-Source validation and manifest selection are independent of MapLibre. MapLibre
-and the HTTP adapters handle rendering and retrieval. Raster images retain their
-upstream portrayal; no client-side S-52 engine is introduced.
+[`web/chart-modes.js`](../../web/chart-modes.js) validates the raster descriptor,
+switches modes while retaining the camera, and reports source status and scale
+limits. [`web/main.js`](../../web/main.js) creates the MapLibre sources and
+layers. Raster images retain their upstream portrayal.
 
 ## Publication and offline consistency
 
 Validate artifacts, upload immutable objects, then replace the small manifest.
-Keep the prior manifest for rollback. A reader must obtain a complete release
+For manual rollback, retain a copy of the prior manifest. A reader must obtain a complete release
 from one manifest, even during publication. Retain existing referenced archives;
 cleanup is a separate operation.
 
-Offline packaging copies the selected artifacts and rewrites their URLs to local
-paths. The optional coverage audit references the vector archive only. Raster
+Offline packaging copies the selected artifacts and writes a package-specific
+manifest. Archive paths resolve against the local offline server. The optional coverage audit references the vector archive only. Raster
 availability and coverage are separate metadata and UI concerns.
 
 ## Compatibility and limitations

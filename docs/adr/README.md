@@ -2,6 +2,8 @@
 
 ADRs capture significant, contested, or non-obvious choices made about ChartTiles' architecture. The format is [Michael Nygard's](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/locales/en/templates/decision-record-template-by-michael-nygard/index.md): title, status, context, decision, consequences.
 
+For deployed behavior and module boundaries, see the [architecture reference](../architecture/README.md).
+
 ## Why we keep ADRs
 
 - A future contributor (or future you) should not have to re-derive a decision from a code search.
@@ -21,6 +23,7 @@ ADRs capture significant, contested, or non-obvious choices made about ChartTile
 | [0007](0007-maplibre-gl-js-for-client-rendering.md) | Use MapLibre GL JS for client rendering | Accepted | 2026-06-29 |
 | [0008](0008-mit-license-with-not-for-navigation-disclaimer.md) | MIT-license the project with a prominent "not for navigation" disclaimer | Accepted | 2026-06-29 |
 | [0009](0009-raster-chart-view-with-vector-inspection.md) | Add raster chart viewing alongside vector inspection | Accepted | 2026-09-27 |
+| [0010](0010-astro-for-public-content.md) | Use Astro for public content | Accepted | 2026-11-16 |
 
 ## Authoring conventions
 

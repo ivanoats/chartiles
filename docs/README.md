@@ -1,64 +1,51 @@
-# ChartTiles Documentation
+# CharTiles documentation
 
-This directory is the canonical reference for ChartTiles' direction, architecture, and decisions.
+Start with the page that matches what you want to do.
 
-## Map of the docs
+## Use and integrate
 
-| Path | What it covers |
+| Document | What it covers |
 | --- | --- |
-| [implementation-plan.md](implementation-plan.md) | Current slices, status, and acceptance gates |
-| [implementation-plan-history.md](implementation-plan-history.md) | Superseded Phase 0–6 plan from v0 scaffolding to v1.0 |
-| [business-plan.md](business-plan.md) | Strategic plan: market, customers, competition, revenue, KPIs |
-| [roadmap.md](roadmap.md) | 18-month timeline tied to sustainability milestones (grants, hosted tier, consulting) |
-| [glossary.md](glossary.md) | Maritime, GIS, and tile-format terminology |
-| [risks-and-safety.md](risks-and-safety.md) | Liability posture, technical risk register, strategic risks |
-| [architecture/](architecture/) | C4 model: system context → containers → components → data flows |
-| [adr/](adr/) | Architecture Decision Records (Michael Nygard format) |
+| [Public developer guide](https://chartiles.com/integrate/) | Integrating chart data in an existing MapLibre map |
+| [Developer quickstart](developer-quickstart.md) | Running a minimal wreck inspection example against the public archive |
+| [Offline bundle](offline-bundle.md) | Building, extracting, and serving the map without an internet connection |
+| [Raster chart view](raster-chart-view.md) | Chart view, vector inspection, and how to import raster imagery |
+| [Feature inspection](feature-inspection.md) | Readable light and hazard cards, source attributes, and validation |
+| [Hosting and site publishing](../hosting/README.md) | Chart uploads, Astro pages, Markdown drafts, and Netlify previews |
+| [CUGOS talk](../talks/cugos/README.md) | Presentation, localhost rehearsal, and sources |
 
-## How these docs are organized
+## Understand the system
 
-The architecture follows the [C4 model](https://c4model.com/) at four levels of zoom. Diagrams are written inline as MermaidJS fenced code blocks; GitHub renders them natively and most IDEs have a preview extension.
+| Document | What it covers |
+| --- | --- |
+| [Architecture](architecture/README.md) | What runs today, where it runs, and how components interact |
+| [Architecture decision records](adr/README.md) | Why we chose the architecture and when those decisions were made |
+| [Risks and safety](risks-and-safety.md) | Inspection limits, data risks, and planned mitigations |
+| [Glossary](glossary.md) | Maritime, GIS, and tile-format vocabulary |
 
-Decisions live in [adr/](adr/). Each ADR captures a single, named, dated choice — context, the decision, and its consequences. New ADRs are appended; existing ones are marked superseded rather than deleted.
+Update the architecture reference when implementation changes. Add an ADR
+when the project makes a significant decision. Accepted ADRs preserve
+historical context.
 
-## Audience
+## Measure and validate
 
-These docs assume the reader is comfortable with:
+- [Shilshole prototype](shilshole-prototype.md) for the small-area build and original measurements.
+- [Puget Sound benchmark](puget-sound-benchmark.md) for regional selection, tile checks, and measurements.
+- [Coverage audit](coverage-audit.md) for what the coverage overlay measures.
+- [Puget Sound release baseline](puget-sound-release-baseline.md) for recorded build and package sizes and publication checks.
+- [Update benchmark](update-benchmark.md) for source revisions and replacement archive costs.
+- [tylertoo benchmark](tylertoo-benchmark.md) for the vector compiler comparison.
 
-- Web infrastructure (HTTP, CDN, object storage).
-- Basic GIS terminology (tiles, projections, vector vs. raster). [glossary.md](glossary.md) covers the rest.
-- The S-57 / S-52 / ENC vocabulary used by maritime hydrographic offices — also in [glossary.md](glossary.md).
+## Plan the next pilot
 
-## Working prototype
+- [Implementation plan](implementation-plan.md) for current status and acceptance criteria.
+- [Business-plan review](business-plan-review.md) for assumptions that need customer evidence.
+- [Developer interviews](developer-interview-guide.md) and [sailor walkthrough](sailor-walkthrough.md) for the two pilot audiences.
 
-[Shilshole prototype](shilshole-prototype.md) — run instructions, measured results, validation boundaries and next gate.
+## Historical plans and research
 
-[Puget Sound expansion](puget-sound-expansion.md) — next implementation steps, coverage decisions and measurement gates.
-
-[Puget Sound benchmark](puget-sound-benchmark.md) — regional selection, measurements and review status.
-
-[Update benchmark](update-benchmark.md) — source revision checks and measured full-replacement size.
-
-[Offline bundle](offline-bundle.md) — package, extract and serve without npm or internet.
-
-[Readable feature inspection](feature-inspection.md) — light cards, explicit buoy associations, depth-area context, and verification.
-
-## Current work
-
-[Implementation plan](implementation-plan.md) — current inspection, association, update, and coverage slices with acceptance gates.
-
-[Njord implementation lessons](njord-implementation-lessons.md) — source review informing the sequence.
-
-[Business-plan review](business-plan-review.md) — customer and revenue assumptions to test.
-
-[Developer interview guide](developer-interview-guide.md) — outreach message and 30-minute interview script.
-
-[Developer quickstart](developer-quickstart.md) — load the published Puget Sound archive in a minimal app.
-
-[Sailor walkthrough](sailor-walkthrough.md) — 15-minute inspection session.
-
-[Puget Sound release baseline](puget-sound-release-baseline.md) — artifact sizes, build time, and release checks.
-
-[Raster chart view plan](raster-chart-plan.md) — original raster milestone and acceptance checks.
-
-[Raster chart view](raster-chart-view.md) — implemented modes, source measurements, import and release instructions.
+- [Original implementation phases](implementation-plan-history.md)
+- [Puget Sound expansion plan](puget-sound-expansion.md)
+- [Raster implementation plan](raster-chart-plan.md)
+- [Original business plan](business-plan.md) and [sustainability roadmap](roadmap.md)
+- [Njord implementation review](njord-implementation-lessons.md)

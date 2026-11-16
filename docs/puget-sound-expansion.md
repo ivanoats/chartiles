@@ -1,10 +1,12 @@
 # Puget Sound expansion
 
+> This page preserves the original regional expansion plan. The [Puget Sound benchmark](puget-sound-benchmark.md) documents the implemented region and remaining validation. Follow the [implementation plan](implementation-plan.md) for current work.
+
 ## Starting point
 
 The Shilshole prototype works end to end. On September 26, 2026, Ivan confirmed completion of the manual NOAA checks with no discrepancies. Proceed with regional expansion; do not repeat that approval gate.
 
-The documented small-area baseline is 472,065 archive bytes, 922 features including 479 soundings, and roughly six seconds to build on the development machine. Preserve its config and source artifacts for regression comparisons. The implementation is on `codex/shilshole-prototype` with uncommitted changes; account for that work before committing the expansion.
+The documented small-area baseline is 472,065 archive bytes, 922 features including 479 soundings, and roughly six seconds to build on the development machine. Preserve its config and source artifacts for regression comparisons.
 
 ## Scope
 

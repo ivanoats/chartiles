@@ -1,7 +1,8 @@
 # Raster chart view implementation plan
 
-Date: 2026-09-27. Status: implemented locally; production publication and pilot review remain.
-See [implementation and measurements](raster-chart-view.md).
+Original plan dated 2026-09-27. Chart view is available in the hosted Puget
+Sound viewer and combined offline bundles. See [current operation and
+measurements](raster-chart-view.md).
 
 ## Outcome and scope
 

@@ -1,9 +1,10 @@
 # Implementation plan
 
-Last revised 2026-11-14. The Puget Sound pipeline, raster display, offline
-packaging, and light and hazard inspection cards are implemented. The objective is
-a useful, trustworthy inspection pilot and one external developer integration, not
-a complete S-52 renderer.
+Last revised 2026-11-16. The Puget Sound pipeline, raster display, offline
+packaging, and light and hazard inspection cards are implemented. The public
+Astro site includes a Markdown developer guide, a blog, and the CUGOS talk.
+The objective is a trustworthy inspection pilot and one external developer
+integration. Full S-52 rendering remains outside the current scope.
 
 The [Njord source review](njord-implementation-lessons.md) informs the technical
 work. The [business-plan critique](business-plan-review.md) records the assumptions
@@ -18,7 +19,9 @@ disagrees with this file, this file wins.
 | --- | --- | --- |
 | Slice 1 — Shared attributes and hazard inspection | Done, merged 2026-09-29 | [PR #4](https://github.com/ivanoats/chartiles/pull/4) |
 | Slice 1.1 — Sounding labels on initial view | Done, merged 2026-11-14 | [PR #9](https://github.com/ivanoats/chartiles/pull/9) |
-| Slice 1.2 — Continuous integration and license | CI verified on GitHub | [PR #10](https://github.com/ivanoats/chartiles/pull/10) |
+| Slice 1.2 — Continuous integration and license | Done, merged 2026-11-14 | [PR #10](https://github.com/ivanoats/chartiles/pull/10) |
+| Public site and Markdown blog | Astro site deployed. First post is a draft. | [PR #14](https://github.com/ivanoats/chartiles/pull/14) |
+| CUGOS talk and pilot materials | Deck and guides merged. Sessions and interview outcomes remain to be recorded. | [PR #12](https://github.com/ivanoats/chartiles/pull/12), [PR #13](https://github.com/ivanoats/chartiles/pull/13) |
 | Business review | Overdue, was due 2026-10-29 | [Evidence log](#evidence-log) |
 | Slice 2 — Build-time aid associations | Not started | — |
 | Slice 3 — Verified managed updates | Not started; catalog checker exists | `pipeline/check_updates.py` |
@@ -28,12 +31,11 @@ Update this table in the same pull request that changes a slice's state.
 
 ## Sequence
 
-1. Slice 1.1, then Slice 1.2. Both are small and unblock everything after them.
-2. Hold the business review. If no interviews have happened, they are the next
+1. Hold the business review. If no interviews have happened, they are the next
    action, ahead of more code.
-3. Slice 2 or Slice 3, chosen by the review (see
+2. Slice 2 or Slice 3, chosen by the review (see
    [Choosing between Slice 2 and Slice 3](#choosing-between-slice-2-and-slice-3)).
-4. Slice 4, before adding usage bands or expanding geographically.
+3. Slice 4, before adding usage bands or expanding geographically.
 
 ## The pilot
 
@@ -68,12 +70,12 @@ and verify readable cards alongside raw data. No archive rebuild is required.
 
 ## Slice 1.1 — Sounding labels on initial view
 
-Fixed locally on 2026-11-14. The `styleimagemissing` event generated label images
+Merged on 2026-11-14. The `styleimagemissing` event generated label images
 after MapLibre had assembled the tile worker response. Using
 `setMissingStyleImageResolver()` supplies those images before the response.
 The browser regression now selects the fixture sounding on fresh loads at each
-zoom from 14 through 18 without toggling `SOUNDG`. All 16 browser tests pass,
-including the existing buoy, rock, and wreck checks. Collision rules are unchanged.
+zoom from 14 through 18 without toggling `SOUNDG`. The suite also checks buoy,
+rock, and wreck inspection.
 
 Acceptance: a sounding label is selectable on first load at zoom 14 and above
 without touching the layer toggle; the toggle workaround is removed from the
@@ -81,19 +83,9 @@ browser test; other point layers still place as before.
 
 ## Slice 1.2 — Continuous integration and license
 
-The acceptance criteria in every slice rest on tests that only run locally, and
-the repository's license state contradicts
+The project uses the [MIT license](../LICENSE), with matching metadata in
+`package.json` and the safety posture recorded in
 [ADR-0008](adr/0008-mit-license-with-not-for-navigation-disclaimer.md).
-
-- Add a GitHub Actions workflow that runs `npm test` on every pull request.
-- Run the Playwright suite in CI if a chart archive small enough to fetch or
-  commit as a fixture is available; otherwise record why not and what covers the
-  gap.
-- Add a `LICENSE` file and set `license` in `package.json` to match ADR-0008, or
-  amend the ADR if the decision has changed.
-
-Acceptance: a pull request with a failing unit test cannot show green; the license
-in `package.json`, the `LICENSE` file, and ADR-0008 agree.
 
 The CI workflow runs Python and JavaScript unit tests and the Chromium suite on
 pull requests. The [browser fixtures](../tests/fixtures/README.md) contain small
@@ -122,9 +114,8 @@ changed and newly relevant cells, flag withdrawals, build, validate, and publish
 the manifest last. Expose installed release, source revisions, last successful
 check, coverage, and download size. Retain the prior release for rollback.
 
-Decide before starting: where the scheduled check runs (it depends on Slice 1.2 if
-it runs in GitHub Actions) and how many prior releases are retained and for how
-long.
+Decide where the scheduled job runs and how many prior releases to retain and
+for how long. Current GitHub Actions workflows check pull requests.
 
 Acceptance: unchanged inputs are a no-op; missed runs catch up; incomplete catalogs
 and failed builds cannot replace a usable release; a rollback to the prior release
@@ -192,8 +183,8 @@ Target: five developer interviews and three sailor sessions.
 
 ### Review and stop conditions
 
-The first review was due 2026-10-29 and has not been recorded. Set a new date
-when this revision merges and write the outcome below.
+The first review was due 2026-10-29 and has not been recorded. Set a new
+review date and record the outcome below.
 
 At each review:
 
