@@ -9,8 +9,10 @@ click a chart mark and see what NOAA recorded. It asks why adding nautical chart
 a web map takes more work than adding an OpenStreetMap basemap. MapLibre can
 display NOAA imagery with a configured raster source. Loading the feature
 records for inspection takes another step. CharTiles packages them as PMTiles. A missing coastline segment makes the
-risk of conversion visible. The closing slide invites organizations to email Ivan about a map or chart
-they want to move to a low-cost open-source stack.
+risk of conversion visible. The second-to-last slide recaps the pipeline,
+from ingest to publish, and the check at each stage. The closing slide
+invites organizations to email Ivan about a map, chart, or dataset that's
+stuck, and links to his work-with-me page.
 
 ## Present or rehearse
 
