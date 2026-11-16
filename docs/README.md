@@ -51,6 +51,14 @@ These docs assume the reader is comfortable with:
 
 [Business-plan review](business-plan-review.md) — customer and revenue assumptions to test.
 
+[Developer interview guide](developer-interview-guide.md) — outreach message and 30-minute interview script.
+
+[Developer quickstart](developer-quickstart.md) — load the published Puget Sound archive in a minimal app.
+
+[Sailor walkthrough](sailor-walkthrough.md) — 15-minute inspection session.
+
+[Puget Sound release baseline](puget-sound-release-baseline.md) — artifact sizes, build time, and release checks.
+
 [Raster chart view plan](raster-chart-plan.md) — original raster milestone and acceptance checks.
 
 [Raster chart view](raster-chart-view.md) — implemented modes, source measurements, import and release instructions.

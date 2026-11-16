@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChartTiles Puget Sound quickstart</title>
+  <style>
+    body { font: 1rem system-ui, sans-serif; margin: 1rem; }
+    #map { height: 55vh; min-height: 16rem; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <h1>Puget Sound wreck inspection</h1>
+  <p>NOAA ENC data via ChartTiles. For inspection only. Not for navigation.</p>
+  <p id="status" role="status">Loading chart data…</p>
+  <div id="map" aria-label="Wrecks near Shilshole"></div>
+  <pre id="feature" aria-live="polite"></pre>
+  <details><summary>Release and source cells</summary><pre id="release"></pre></details>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

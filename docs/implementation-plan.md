@@ -173,6 +173,13 @@ feedback. Prioritize repeated problems, not feature completeness. Unawarded gran
 are not operating runway. Production publication and outreach remain separate
 actions from local implementation.
 
+Use the [developer interview guide](developer-interview-guide.md) for outreach
+and the interview script.
+Use the [developer quickstart](developer-quickstart.md) for an integration trial
+and the [sailor walkthrough](sailor-walkthrough.md) for inspection sessions.
+The [release baseline](puget-sound-release-baseline.md) records current build and
+artifact measurements for those conversations.
+
 ### Evidence log
 
 One row per conversation or session. Do not record private contact details here.
