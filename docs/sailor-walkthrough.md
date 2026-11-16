@@ -2,14 +2,16 @@
 
 Use the same 15-minute inspection exercise with three sailors. Run it ashore
 in the full ChartTiles viewer with the Puget Sound archive and the current
-viewer code. Use a [local offline bundle](offline-bundle.md) so every session
-has the same data and controls.
+viewer code. Build the [combined vector and raster offline bundle](offline-bundle.md#optional-raster-imagery)
+with `npm run package:offline:raster` so every session has both **Chart view**
+and **Inspect features**.
 
 ## Setup
 
 Before the session, open the local viewer and check the two spots below.
 On the default offline server, use `http://127.0.0.1:8080/` followed by the
-specified map hash. Reset to the default chart mode at the start of each task.
+specified map hash. Confirm that **Chart view** and **Inspect features** both
+work, then reset to **Chart view** at the start of each task.
 
 - Sounding near Shilshole, `#15/47.6529827/-122.4671341`. Zoom 15 is enough
   to see the sounding, with a recorded depth of 226.4 m.

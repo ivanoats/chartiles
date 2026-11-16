@@ -13,8 +13,8 @@ npm ci
 npm exec -- vite examples/puget-sound --host 127.0.0.1 --port 8090 --strictPort
 ```
 
-Open <http://127.0.0.1:8090/> and click the magenta marker in the center of the
-map. The sample wreck's key is `US5SEAGK:WRECKS:0226EA5A5C0C1923` and its depth
+Open <http://127.0.0.1:8090/> and choose **Inspect centered wreck** or click the
+magenta marker in the center of the map. The sample wreck's key is `US5SEAGK:WRECKS:0226EA5A5C0C1923` and its depth
 is unrecorded (`null`). Open **Release and source cells** and find `US5SEAGK`
 to see the edition, update number, and issue date for the selected wreck's
 source. [Example source](../examples/puget-sound/main.js)

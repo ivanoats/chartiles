@@ -6,6 +6,7 @@ import {Protocol} from 'pmtiles';
 const service = 'https://chartiles-data.ivanstorck.workers.dev/';
 const status = document.querySelector('#status');
 const feature = document.querySelector('#feature');
+const inspectCenter = document.querySelector('#inspect-center');
 const release = document.querySelector('#release');
 const wreck = [-122.4145, 47.6766];
 const json = value => JSON.stringify(value, null, 2);
@@ -48,12 +49,14 @@ async function start() {
     },
   });
   map.once('load', () => {
-    status.textContent = 'Select the wreck marker near the center of the map.';
+    status.textContent = 'Select a wreck marker or choose Inspect centered wreck.';
+    inspectCenter.disabled = false;
   });
   map.on('error', ({error}) => {
     status.textContent = `Chart load error: ${error.message}`;
   });
-  map.on('click', 'wrecks', ({features: [selected]}) => {
+  function showWreck(selected) {
+    status.textContent = 'Showing the selected wreck.';
     const {feature_key, source_cell, VALSOU} = selected.properties;
     const revision = manifest.sources.find(cell => cell.name === source_cell);
     feature.textContent = json({
@@ -62,6 +65,20 @@ async function start() {
       recorded_depth_m: VALSOU ?? null,
       source_revision: revision ? {edition: revision.edtn, update: revision.updn, issued: revision.isdt} : null,
     });
+  }
+
+  map.on('click', 'wrecks', ({features: [selected]}) => showWreck(selected));
+  inspectCenter.addEventListener('click', () => {
+    const {x, y} = map.project(map.getCenter());
+    const [selected] = map.queryRenderedFeatures(
+      [[x - 8, y - 8], [x + 8, y + 8]], {layers: ['wrecks']},
+    );
+    if (selected) {
+      showWreck(selected);
+    } else {
+      feature.textContent = '';
+      status.textContent = 'No wreck marker near the center. Pan the map and try again.';
+    }
   });
 }
 
