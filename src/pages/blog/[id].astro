@@ -1,0 +1,23 @@
+---
+import {render} from 'astro:content';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import {formatDate, getPosts} from '../../components/blog.mjs';
+
+export async function getStaticPaths() {
+  return (await getPosts()).map(post => ({params: {id: post.id}, props: {post}}));
+}
+
+const {post} = Astro.props;
+const {title, description, date, draft} = post.data;
+const {Content} = await render(post);
+---
+<SiteLayout {title} {description} noindex={draft}>
+  <article class="guide">
+    <p class="label"><a href="/blog/">Blog</a>{draft && ' · Draft'}</p>
+    <h1>{title}</h1>
+    <p class="post-meta"><time datetime={date.toISOString().slice(0, 10)}>{formatDate(date)}</time></p>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</SiteLayout>

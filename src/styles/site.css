@@ -251,3 +251,16 @@ code { font-family: var(--font-mono); overflow-wrap: anywhere; }
 @media (forced-colors: active) {
   .theme-icon { background: none; color: ButtonText; box-shadow: inset .4rem 0 0 currentColor; forced-color-adjust: none; }
 }
+
+.footer-links { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+.prose { display: grid; gap: var(--space-4); min-width: 0; }
+.prose h2 { margin-block-start: var(--space-4); }
+.prose p:first-child { font-size: 1.125rem; }
+.prose :where(p, ul, ol) { max-width: 70ch; }
+.prose :where(ul, ol) { margin: 0; padding-inline-start: var(--space-6); }
+.prose img { display: block; max-width: 100%; height: auto; border-radius: var(--radius-md); }
+.prose pre { overflow-x: auto; padding: var(--space-4); border-radius: var(--radius-md); }
+.prose pre code { overflow-wrap: normal; }
+.post-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); }
+.post-list .card a { display: inline; }
+.post-meta { color: var(--colors-ink-muted); font-size: var(--type-body-sm); }

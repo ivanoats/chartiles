@@ -43,15 +43,24 @@ Worker requests and R2 operations are metered under the account's plans.
 
 ## Publish the viewer
 
-Netlify builds with `npm run build:site` and publishes `dist`. Netlify serves the
-homepage at `/` and the inspection map at `/inspect.html`. Preview both locally
-by running the site build followed by `npm run preview`. Run the homepage smoke
-tests against a deploy preview with
+Netlify runs `npm run build:site` with Node.js 24 and publishes `dist`.
+Astro builds the Verdant pages at `/`, `/integrate/`, and `/blog/`. The
+same command stages the Vite inspection map at `/inspect.html` and the
+standalone slide deck at `/cugos/`. The chart data stays on its existing host.
+
+To preview the site locally, run `npm run build:site` followed by
+`npm run preview`. Run the homepage smoke tests against a deploy preview with
 `CHARTILES_SITE_URL=https://your-preview.example npm run test:browser -- homepage`.
-The default `npm run build` builds only the map for offline bundles. The generated
-chart directory is gitignored and does not need to exist on the Netlify build runner.
-The redirect in `netlify.toml` supplies charts independently of frontend builds.
-Local Vite development continues to use the local chart bundle.
+
+Edit the developer guide at `src/content/developer-guide.md` and add posts in
+`src/content/blog/`. Each post has a title, description, and date in its Markdown
+frontmatter. Set `draft: true` while reviewing a post. Local builds and Netlify
+deploy previews render drafts, with a `noindex` tag on each draft page.
+Netlify production builds omit draft pages and their listing entries.
+
+The default `npm run build` still builds only the map for offline bundles. The
+generated chart directory is gitignored and does not need to exist on the
+Netlify build runner. Local Vite development uses the local chart bundle.
 
 After publishing, verify the manifest, a PMTiles range returning HTTP 206,
 CORS headers, and a browser map load. Offline packages continue to include

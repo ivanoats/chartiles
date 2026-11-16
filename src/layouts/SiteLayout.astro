@@ -1,0 +1,64 @@
+---
+import '../styles/site.css';
+import {verdantTheme} from '../components/verdant-theme.mjs';
+const {title, description, noindex = false} = Astro.props;
+const {pathname} = Astro.url;
+const {css, runtime} = verdantTheme();
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content={description}>
+  {noindex && <meta name="robots" content="noindex">}
+  <title>{title} | CharTiles</title>
+  <script is:inline set:html={runtime}></script>
+  <style is:inline set:html={css}></style>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="wordmark" href="/" aria-current={pathname === "/" ? "page" : undefined}>
+        <span class="brand-mark" aria-hidden="true"></span>CharTiles
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="/integrate/" aria-current={pathname.startsWith("/integrate") ? "page" : undefined}>Developers</a>
+        <a href="/blog/" aria-current={pathname.startsWith("/blog") ? "page" : undefined}>Blog</a>
+        <a href="/inspect.html">Inspection map <span aria-hidden="true">↗</span></a>
+      </nav>
+      <details class="theme-picker">
+        <summary aria-label="Color theme" title="Color theme">
+          <span class="theme-icon" aria-hidden="true"></span>
+        </summary>
+        <fieldset>
+          <legend>Color theme</legend>
+          <label><input type="radio" name="theme-preference" value="system" checked> System</label>
+          <label><input type="radio" name="theme-preference" value="light"> Light</label>
+          <label><input type="radio" name="theme-preference" value="dark"> Dark</label>
+        </fieldset>
+      </details>
+    </div>
+  </header>
+
+  <main id="content" class="shell">
+    <slot />
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <div class="footer-about">
+        <p><strong>CharTiles</strong> · MIT-licensed software.<br>Derived from NOAA Electronic Navigational Charts.</p>
+        <p>By <a href="https://ivanstorck.com">Ivan Storck</a> and
+          <a href="https://sustainablewebsites.com">Sustainable Websites</a>.
+          Built with <a href="https://verdant-design.org">Verdant</a>.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/cugos/">CUGOS talk</a>
+        <a class="footer-feedback" href="https://github.com/ivanoats/chartiles/issues">Share feedback <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
