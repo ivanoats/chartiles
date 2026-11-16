@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Add inspectable NOAA chart features to your marine web app. Explore the experimental Puget Sound map or use the open PMTiles archive with MapLibre.">
-  <title>ChartTiles | Open chart data for marine apps</title>
+  <title>CharTiles | Open chart data for marine apps</title>
   <link rel="stylesheet" href="./homepage/home.css">
 </head>
 <body>
@@ -12,10 +12,10 @@
   <header class="site-header">
     <div class="shell header-inner">
       <a class="wordmark" href="./home.html" aria-current="page">
-        <span class="brand-mark" aria-hidden="true"></span>ChartTiles
+        <span class="brand-mark" aria-hidden="true"></span>CharTiles
       </a>
       <nav aria-label="Main navigation">
-        <a href="#developers">Developers</a>
+        <a href="./integrate.html">Developers</a>
         <a href="./index.html">Inspection map <span aria-hidden="true">↗</span></a>
       </nav>
     </div>
@@ -29,7 +29,7 @@
         <p class="lede">Add inspectable NOAA chart features to your map with a single PMTiles archive. Load it in MapLibre without running your own chart conversion pipeline or tile server.</p>
         <div class="actions">
           <a class="action primary" href="./index.html">Open the inspection map <span aria-hidden="true">↗</span></a>
-          <a class="action secondary" href="#developers">Use the data</a>
+          <a class="action secondary" href="./integrate.html">Use the data</a>
         </div>
         <p class="notice">Experimental chart data. Not for navigation.</p>
       </div>
@@ -38,26 +38,26 @@
              srcset="./homepage/shilshole-small.webp 420w, ./homepage/shilshole.webp 755w"
              sizes="(min-width: 70rem) 32rem, (min-width: 55rem) 46vw, 94vw"
              width="755" height="610" fetchpriority="high"
-             alt="ChartTiles map centered on the two Shilshole Bay entrance buoys, with nearby depth soundings and contours.">
+             alt="CharTiles map centered on the two Shilshole Bay entrance buoys, with nearby depth soundings and contours.">
         <figcaption>
           <span>Shilshole Bay, Washington</span>
-          <span>NOAA ENC · ChartTiles preview</span>
+          <span>NOAA ENC · CharTiles preview</span>
         </figcaption>
       </figure>
     </section>
 
     <section class="benefits" aria-labelledby="benefits-title">
-      <h2 id="benefits-title">What you can do with ChartTiles</h2>
+      <h2 id="benefits-title">What you can do with CharTiles</h2>
       <div class="benefit-grid">
         <article class="card">
           <h3>Put chart features in your app</h3>
           <p>Use the public archive to put buoys, lights, wrecks, and soundings on a MapLibre map. Serve the same file from your own storage when you need to.</p>
-          <a href="#developers">See how to integrate <span aria-hidden="true">→</span></a>
+          <a href="./integrate.html">See how to integrate <span aria-hidden="true">→</span></a>
         </article>
         <article class="card">
           <h3>See what the chart recorded</h3>
           <p>Select a feature and read its recorded attributes, including depth and sounding quality where present. Trace it back to the NOAA source cell.</p>
-          <a href="./index.html#18/47.6766/-122.4145">Explore near Shilshole <span aria-hidden="true">↗</span></a>
+          <a href="./index.html?view=features#18/47.6766/-122.4145">Explore near Shilshole <span aria-hidden="true">↗</span></a>
         </article>
         <article class="card">
           <h3>Review charts offline</h3>
@@ -74,7 +74,7 @@
         <p>Read the release manifest for the archive URL, build date, and NOAA cell revisions. Then use the PMTiles protocol to add the vector source in MapLibre.</p>
         <div class="actions">
           <a class="action primary" href="https://chartiles-data.ivanstorck.workers.dev/charts/manifest.json">Open the release manifest <span aria-hidden="true">↗</span></a>
-          <a class="action secondary" href="https://github.com/ivanoats/chartiles">View the source <span aria-hidden="true">↗</span></a>
+          <a class="action secondary" href="./integrate.html">Read the integration guide <span aria-hidden="true">↗</span></a>
         </div>
       </div>
       <ol class="integration-steps">
@@ -87,7 +87,7 @@
 
   <footer class="site-footer">
     <div class="shell footer-inner">
-      <p><strong>ChartTiles</strong> · MIT-licensed software.<br>Derived from NOAA Electronic Navigational Charts.</p>
+      <p><strong>CharTiles</strong> · MIT-licensed software.<br>Derived from NOAA Electronic Navigational Charts.</p>
       <a href="https://github.com/ivanoats/chartiles/issues">Share feedback <span aria-hidden="true">↗</span></a>
     </div>
   </footer>

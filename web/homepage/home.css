@@ -159,3 +159,23 @@ code { font-family: var(--font-mono); overflow-wrap: anywhere; }
   .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: var(--space-12); }
   .developer-panel { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: var(--space-12); }
 }
+
+.guide {
+  display: grid;
+  gap: var(--space-6);
+  max-width: 48rem;
+  margin-block: var(--space-12);
+}
+.guide h1 { max-width: 21ch; font-size: clamp(2.25rem, 5vw, 3.75rem); }
+.guide section { display: grid; min-width: 0; gap: var(--space-4); }
+.guide pre {
+  overflow-x: auto;
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--colors-border);
+  border-radius: var(--radius-md);
+  background: var(--colors-surface-200);
+  font-size: var(--type-body-sm);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

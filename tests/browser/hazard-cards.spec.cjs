@@ -6,8 +6,11 @@ const cases = fixtures.flatMap(feature =>
 for (const {feature, zoom} of cases) {
   test(`inspect real ${feature.sourceLayer} at zoom ${zoom} with chart depth and raw attributes`, async ({page}) => {
     const [lng,lat] = feature.geometry.coordinates;
-    await page.goto(`/#${zoom}/${lat}/${lng}`);
-    await page.getByRole('button',{name:'Inspect features',exact:true}).click();
+    const deepLink = feature.sourceLayer === 'WRECKS';
+    await page.goto(`/${deepLink ? '?view=features' : ''}#${zoom}/${lat}/${lng}`);
+    const inspect = page.getByRole('button', {name: 'Inspect features', exact: true});
+    if (deepLink) await expect(inspect).toHaveAttribute('aria-pressed', 'true');
+    else await inspect.click();
     await page.waitForFunction(() => performance.getEntriesByName('chartiles-first-idle').length > 0);
     const map = page.locator('#map');
     const box = await map.boundingBox();

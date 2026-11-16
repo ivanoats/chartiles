@@ -3,6 +3,8 @@
 Netlify serves the viewer at https://chartiles.com. The `/charts/*` redirect
 sends browsers to https://chartiles-data.ivanstorck.workers.dev, where a
 read-only Worker streams objects from the private `chartiles-charts` R2 bucket.
+The viewer resolves archive URLs on the host that served the manifest so
+PMTiles byte-range requests reach the Worker directly.
 Netlify continues to manage DNS. CORS is handled by the Worker, including for
 Netlify deploy previews. Public bucket access is not required.
 

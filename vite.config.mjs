@@ -28,7 +28,7 @@ function verdantHomepage() {
   return {
     name: 'verdant-homepage',
     transformIndexHtml(_html, {filename}) {
-      if (filename.endsWith('/home.html')) {
+      if (['home.html', 'integrate.html'].some(file => filename.endsWith(`/${file}`))) {
         return [{tag: 'style', children: css, injectTo: 'head'}];
       }
     },
@@ -45,7 +45,7 @@ export default defineConfig(({mode}) => ({
     // Keep index.html as the entry point for offline bundles and fixture tests.
     ...(mode === 'site' && {
       rolldownOptions: {
-        input: ['index.html', 'home.html'].map(file =>
+        input: ['index.html', 'home.html', 'integrate.html'].map(file =>
           fileURLToPath(new URL(`./web/${file}`, import.meta.url))),
       },
     }),
